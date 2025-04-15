@@ -9,7 +9,13 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 export type TextProps = ReactNativeTextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: "default" | "title" | "defaultSemiBold" | "subtitle" | "link";
+  type?:
+    | "default"
+    | "faded"
+    | "title"
+    | "defaultSemiBold"
+    | "subtitle"
+    | "link";
 };
 
 export function Text({
@@ -20,12 +26,17 @@ export function Text({
   ...rest
 }: TextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+  const colorFaded = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    "textFaded"
+  );
 
   return (
     <ReactNativeText
       style={[
-        { color },
+        { color: type === "faded" ? colorFaded : color },
         type === "default" ? styles.default : undefined,
+        type === "faded" ? styles.default : undefined,
         type === "title" ? styles.title : undefined,
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
         type === "subtitle" ? styles.subtitle : undefined,
