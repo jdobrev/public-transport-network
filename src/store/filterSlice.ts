@@ -1,3 +1,4 @@
+import { TransportType, TRANSPORT_TYPES } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
@@ -12,10 +13,18 @@ export type FilterViewTypeValue =
 
 type FilterStore = {
   viewType: FilterViewTypeValue;
+  shownTransports: Record<TransportType, boolean>;
+  hiddenLines: Record<string, true | undefined>;
 };
 
 const initialState: FilterStore = {
   viewType: "list",
+  shownTransports: {
+    [TRANSPORT_TYPES.A]: true,
+    [TRANSPORT_TYPES.TB]: true,
+    [TRANSPORT_TYPES.TM]: true,
+  },
+  hiddenLines: {},
 };
 
 export const filterSlice = createSlice({
@@ -24,6 +33,33 @@ export const filterSlice = createSlice({
   reducers: {
     setViewType: (state, action: PayloadAction<FilterViewTypeValue>) => {
       state.viewType = action.payload;
+    },
+    toggleTransportType: (state, action: PayloadAction<TransportType>) => {
+      if (!state.shownTransports) {
+        state.shownTransports = {
+          [TRANSPORT_TYPES.A]: true,
+          [TRANSPORT_TYPES.TB]: true,
+          [TRANSPORT_TYPES.TM]: true,
+        };
+      }
+
+      if (!state.shownTransports[action.payload]) {
+        state.shownTransports[action.payload] = true;
+      } else {
+        state.shownTransports[action.payload] = false;
+      }
+    },
+    toggleLine: (state, action: PayloadAction<string>) => {
+      const line = action.payload;
+      if (!state.hiddenLines) {
+        state.hiddenLines = {};
+      }
+
+      if (state.hiddenLines[line]) {
+        delete state.hiddenLines[line];
+      } else {
+        state.hiddenLines[line] = true;
+      }
     },
   },
 });

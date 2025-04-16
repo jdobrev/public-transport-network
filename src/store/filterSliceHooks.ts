@@ -1,3 +1,4 @@
+import { TransportType } from "@/types";
 import { FilterViewTypeValue, filterSlice } from "./filterSlice";
 import { useAppDispatch, useAppSelector } from "./store";
 
@@ -11,4 +12,16 @@ export const useSetViewType = () => {
   };
 
   return setViewType;
+};
+
+export const useTransportFilter = () =>
+  useAppSelector((state) => state.filter.shownTransports);
+
+export const useToggleTransportFilter = () => {
+  const dispatch = useAppDispatch();
+  const toggleTransport = (transportType: TransportType) => {
+    dispatch(filterSlice.actions.toggleTransportType(transportType));
+  };
+
+  return toggleTransport;
 };

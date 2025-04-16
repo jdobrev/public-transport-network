@@ -46,12 +46,10 @@ export function useCollapsibleHeader() {
       const y = event.contentOffset.y;
       if (y > prevScrollY.value && y > DEFAULT_HEADER_HEIGHT) {
         // Scrolling down
-        headerState.value = withTiming(COLLAPSED, {
-          duration: ANIMATION_DURATION,
-        });
+        collapse();
       } else if (
         y < prevScrollY.value &&
-        prevScrollY.value - y > EXPAND_THRESHOLD
+        (prevScrollY.value - y > EXPAND_THRESHOLD || y < EXPAND_THRESHOLD * 2)
       ) {
         // Scrolling up
         expand();

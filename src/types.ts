@@ -5,17 +5,8 @@ export type Vehicle = (typeof vehicles)[number];
 export type PublicTransportData = (typeof publicTransportData)[number];
 
 export const TRANSPORT_TYPES = {
-  A: {
-    value: "A",
-    label: "Bus",
-  },
-  TB: {
-    value: "TB",
-    label: "Trolleybus",
-  },
-  TM: {
-    value: "TM",
-    label: "Tram",
-  },
+  A: "A", //"Bus"
+  TB: "TB", //"Trolleybus"
+  TM: "TM", //"Tram"
 } as const;
 export type TransportType = keyof typeof TRANSPORT_TYPES;
