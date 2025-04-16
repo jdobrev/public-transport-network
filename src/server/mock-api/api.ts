@@ -3,8 +3,9 @@ import publicTransportData from "./public-transport-data.json";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+//TODO maybe add delay/error chance to settings?
 const simulateCall = async ({
-  delay = 1250,
+  delay = 250,
   errorMessage: message,
   errorChance = 0.2,
 }: {

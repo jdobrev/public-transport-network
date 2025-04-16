@@ -1,6 +1,5 @@
 import {
   StyleSheet,
-  FlatList,
   RefreshControl,
   ListRenderItem,
   LayoutChangeEvent,
@@ -15,8 +14,11 @@ import React from "react";
 import { Vehicle } from "@/types";
 import ActivityIndicator from "@/components/ActivityIndicator";
 import { SafeAreaView } from "@/components/SafeAreaView";
+import Animated from "react-native-reanimated";
 
 const VEHICLE_ITEM_HEIGHT = 100;
+
+import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 
 type RenderItemArgs = Parameters<ListRenderItem<Vehicle>>[0];
 
@@ -42,6 +44,8 @@ export default function VehiclesScreen() {
     isFetchingNextPage,
   } = useVehicles();
 
+  const { Header, scrollHandler, totalHeaderHeight } = useCollapsibleHeader();
+
   const vehicles = useMemo(
     () => data?.pages.flatMap((page) => page.data) ?? [],
     [data]
@@ -65,7 +69,12 @@ export default function VehiclesScreen() {
 
   return (
     <SafeAreaView>
-      <FlatList
+      <Header>
+        <View>
+          <Text type="title">Vehicles</Text>
+        </View>
+      </Header>
+      <Animated.FlatList
         data={vehicles}
         renderItem={renderVehicle}
         keyExtractor={(item) => item.vehID}
@@ -73,6 +82,7 @@ export default function VehiclesScreen() {
           <RefreshControl
             refreshing={isFetching && !isFetchingNextPage}
             onRefresh={refetch}
+            progressViewOffset={totalHeaderHeight}
           />
         }
         onEndReached={() => {
@@ -104,6 +114,8 @@ export default function VehiclesScreen() {
           ) : null
         }
         onLayout={onListLayout}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
       />
     </SafeAreaView>
   );

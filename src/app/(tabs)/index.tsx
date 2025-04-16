@@ -1,7 +1,5 @@
-import { Image, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Text } from "@/components/Text";
 import { View } from "@/components/View";
 import { FILTER_VIEW_TYPE_VALUES } from "@/store/filterSlice";
@@ -10,26 +8,18 @@ import React from "react";
 
 import { useSetViewType, useViewType } from "@/store/filterSliceHooks";
 import Button from "@/components/Button";
+import { SafeAreaView } from "@/components/SafeAreaView";
+import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 
 export default function OverviewScreen() {
   const viewType = useViewType();
   const setViewType = useSetViewType();
-
+  const { Header, scrollHandler, totalHeaderHeight } = useCollapsibleHeader();
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("../../../assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <View style={styles.titleContainer}>
-        <Text type="title">Welcome!</Text>
-        <HelloWave />
-        <Text type="title">{viewType}</Text>
-      </View>
+    <SafeAreaView>
+      <Header>
+        <Text type="title">Overview</Text>
+      </Header>
       <View style={styles.stepContainer}>
         <Button
           onPress={() => {
@@ -48,7 +38,7 @@ export default function OverviewScreen() {
           List
         </Button>
       </View>
-    </ParallaxScrollView>
+    </SafeAreaView>
   );
 }
 

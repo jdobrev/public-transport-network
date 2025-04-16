@@ -5,7 +5,7 @@ import { Text } from "@/components/Text";
 import { View } from "@/components/View";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useColorScheme } from "@/store/settingsSliceHooks";
 
 export function Collapsible({
   children,
