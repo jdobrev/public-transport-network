@@ -44,7 +44,7 @@ export default function VehiclesScreen() {
     isFetchingNextPage,
   } = useVehicles();
 
-  const { Header, scrollHandler, totalHeaderHeight } = useCollapsibleHeader();
+  const { Header, scrollHandler } = useCollapsibleHeader();
 
   const vehicles = useMemo(
     () => data?.pages.flatMap((page) => page.data) ?? [],
@@ -82,7 +82,6 @@ export default function VehiclesScreen() {
           <RefreshControl
             refreshing={isFetching && !isFetchingNextPage}
             onRefresh={refetch}
-            progressViewOffset={totalHeaderHeight}
           />
         }
         onEndReached={() => {
