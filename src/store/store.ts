@@ -18,16 +18,18 @@ import {
   REHYDRATE,
 } from "redux-persist";
 import { filterSlice } from "./filterSlice";
+import { settingsSlice } from "./settingsSlice";
 
 const persistConfig = {
   key: "root",
   version: 1,
   storage: AsyncStorage,
-  whitelist: [filterSlice.reducerPath],
+  whitelist: [filterSlice.reducerPath, settingsSlice.reducerPath],
 };
 
 const rootReducer = combineReducers({
   [filterSlice.reducerPath]: filterSlice.reducer,
+  [settingsSlice.reducerPath]: settingsSlice.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

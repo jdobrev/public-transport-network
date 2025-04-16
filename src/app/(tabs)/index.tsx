@@ -5,13 +5,15 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Text } from "@/components/Text";
 import { View } from "@/components/View";
 import { FILTER_VIEW_TYPE_VALUES } from "@/store/filterSlice";
-import { HapticTab } from "@/components/HapticTab";
+
 import React from "react";
 
-import { useViewType } from "@/store/filterSliceHooks";
+import { useSetViewType, useViewType } from "@/store/filterSliceHooks";
+import Button from "@/components/Button";
 
 export default function OverviewScreen() {
-  const { viewType, setViewType } = useViewType();
+  const viewType = useViewType();
+  const setViewType = useSetViewType();
 
   return (
     <ParallaxScrollView
@@ -29,20 +31,22 @@ export default function OverviewScreen() {
         <Text type="title">{viewType}</Text>
       </View>
       <View style={styles.stepContainer}>
-        <HapticTab
+        <Button
           onPress={() => {
             setViewType(FILTER_VIEW_TYPE_VALUES.MAP);
           }}
+          type={viewType === FILTER_VIEW_TYPE_VALUES.MAP ? "outline" : "ghost"}
         >
-          <Text>Map</Text>
-        </HapticTab>
-        <HapticTab
+          Map
+        </Button>
+        <Button
           onPress={() => {
             setViewType(FILTER_VIEW_TYPE_VALUES.LIST);
           }}
+          type={viewType === FILTER_VIEW_TYPE_VALUES.LIST ? "outline" : "ghost"}
         >
-          <Text>List</Text>
-        </HapticTab>
+          List
+        </Button>
       </View>
     </ParallaxScrollView>
   );

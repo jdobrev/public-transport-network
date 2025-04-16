@@ -5,6 +5,7 @@ import { SymbolWeight } from "expo-symbols";
 import React from "react";
 import { OpaqueColorValue, StyleProp, TextStyle } from "react-native";
 
+//TODO Check how these look on iOS
 // Add your SFSymbol to MaterialIcons mappings here.
 const MAPPING = {
   // See MaterialIcons here: https://icons.expo.fyi
@@ -13,6 +14,7 @@ const MAPPING = {
   "train.side.middle.car": "train",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
+  gear: "settings",
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],
