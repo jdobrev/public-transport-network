@@ -1,5 +1,5 @@
+import Checkbox from "@/components/Checkbox";
 import { SafeAreaView } from "@/components/SafeAreaView";
-import Switch from "@/components/Switch";
 import { Text } from "@/components/Text";
 import { View } from "@/components/View";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
@@ -23,22 +23,13 @@ export default function Settings() {
         <PlaceholderHeader />
         <View style={styles.settingsRow}>
           <Text>Dark theme</Text>
-          {/**TODO fix bug where switch transition becomes 'choppy' after some time */}
-          <Switch
-            value={!isLight}
-            onValueChange={() => {
+          <Checkbox
+            checked={!isLight}
+            onCheckedChange={() => {
               setColorScheme(isLight ? "dark" : "light");
             }}
           />
         </View>
-        {Array(20)
-          .fill(0)
-          .map((_, i) => (
-            <View key={i} style={styles.dummyRow}>
-              <Text>Setting Option {i + 1}</Text>
-              <Switch value={false} onValueChange={() => {}} />
-            </View>
-          ))}
       </Animated.ScrollView>
     </SafeAreaView>
   );

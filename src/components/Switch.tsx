@@ -3,6 +3,7 @@ import { Switch as RNSWitch } from "react-native";
 
 export default function Switch(props: ComponentProps<typeof RNSWitch>) {
   //TODO get colors from theme
+  //TODO fix bug where switch transition becomes 'choppy' after some time
   return (
     <RNSWitch
       trackColor={{ false: "#767577", true: "#81b0ff" }}

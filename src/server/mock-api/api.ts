@@ -5,7 +5,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 //TODO maybe add delay/error chance to settings?
 const simulateCall = async ({
-  delay = 250,
+  delay = 750,
   errorMessage: message,
   errorChance = 0.2,
 }: {

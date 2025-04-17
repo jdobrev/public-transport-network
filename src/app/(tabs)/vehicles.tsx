@@ -19,6 +19,7 @@ import Animated from "react-native-reanimated";
 const VEHICLE_ITEM_HEIGHT = 100;
 
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
+import { GenericListError } from "@/components/Errors";
 
 type RenderItemArgs = Parameters<ListRenderItem<Vehicle>>[0];
 
@@ -44,7 +45,8 @@ export default function VehiclesScreen() {
     isFetchingNextPage,
   } = useVehicles();
 
-  const { Header, scrollHandler, PlaceholderHeader } = useCollapsibleHeader();
+  const { Header, scrollHandler, PlaceholderHeader, headerHeight } =
+    useCollapsibleHeader();
 
   const vehicles = useMemo(
     () => data?.pages.flatMap((page) => page.data) ?? [],
@@ -82,6 +84,7 @@ export default function VehiclesScreen() {
           <RefreshControl
             refreshing={isFetching && !isFetchingNextPage}
             onRefresh={refetch}
+            progressViewOffset={headerHeight}
           />
         }
         onEndReached={() => {
@@ -105,14 +108,7 @@ export default function VehiclesScreen() {
           index,
         })}
         refreshing={isFetching}
-        ListEmptyComponent={
-          isError ? (
-            <View style={styles.error}>
-              <Text>Something went wrong</Text>
-              <Text type="faded">Pull down to try again</Text>
-            </View>
-          ) : null
-        }
+        ListEmptyComponent={isError ? <GenericListError /> : null}
         onLayout={onListLayout}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -122,16 +118,6 @@ export default function VehiclesScreen() {
 }
 
 const styles = StyleSheet.create({
-  error: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-    backgroundColor: "transparent",
-    gap: 8,
-  },
-
   vehicleContainer: {
     height: VEHICLE_ITEM_HEIGHT,
     flexDirection: "row",

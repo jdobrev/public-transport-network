@@ -1,6 +1,7 @@
+import { useMemo } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getVehicles, getPublicTransportData } from "./mock-api/api";
-import { TransportType } from "@/types";
+import { PublicTransportData, TRANSPORT_TYPES, TransportType } from "@/types";
 
 export const useVehicles = () => {
   return useInfiniteQuery({
@@ -12,14 +13,43 @@ export const useVehicles = () => {
   });
 };
 
-export const useTransportData = (filter?: TransportType) => {
-  return useQuery({
+function isTransportType(value: unknown): value is TransportType {
+  return Object.values(TRANSPORT_TYPES).some((val) => val === value);
+}
+
+const groupByTransportType = (data: PublicTransportData[]) => {
+  const groupedData: Record<TransportType, PublicTransportData[]> = {
+    A: [],
+    TB: [],
+    TM: [],
+  };
+
+  data.forEach((item) => {
+    const transportType = item.routes?.[0]?.transportType;
+    if (isTransportType(transportType)) {
+      groupedData[transportType].push(item);
+    } else {
+      console.error(`Invalid transport type: ${transportType}`);
+    }
+  });
+
+  return groupedData;
+};
+
+export const useTransportData = () => {
+  const query = useQuery({
     queryKey: ["transportData"],
     queryFn: getPublicTransportData,
     retry: false, // This is to enable mock api errors
-    select: (data) => {
-      if (!filter) return data;
-      return data.filter((item) => item.routes?.[0]?.transportType === filter); //This relies on the assumption that all routes for a given line have the same transport type
-    },
   });
+
+  const grouped = useMemo(
+    () => (query.data ? groupByTransportType(query.data) : undefined),
+    [query.data]
+  );
+
+  return {
+    ...query,
+    data: grouped,
+  };
 };
