@@ -4,15 +4,33 @@ import React, { useMemo } from "react";
 import Checkbox from "@/components/Checkbox";
 import { StyleSheet } from "react-native";
 import { useHiddenLineById, useToggleLineById } from "@/store/filterSliceHooks";
+import { useRouter } from "expo-router";
+import Button from "@/components/Button";
 
 export const RenderLine = React.memo(
   ({ id, name }: { id: string; name: string }) => {
+    const router = useRouter();
+
     const isHidden = useHiddenLineById(id);
     const toggleLine = useToggleLineById(id);
 
     return (
       <View style={styles.line}>
-        <Text type="small">{name}</Text>
+        <Button
+          onPress={() => {
+            router.push({
+              pathname: "/line/[lineId]",
+              params: { lineId: id },
+            });
+          }}
+          type="ghost"
+          hitSlop={10}
+          style={styles.lineButton}
+        >
+          <Text type="small" style={styles.lineText}>
+            {name}
+          </Text>
+        </Button>
         <Checkbox checked={isHidden} onCheckedChange={toggleLine} />
       </View>
     );
@@ -43,16 +61,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    marginVertical: 2,
+    paddingHorizontal: 4,
     borderBottomWidth: 1,
+  },
+  lineButton: {
+    padding: 0,
+    margin: 0,
+    flex: 1,
+  },
+  lineText: {
+    textAlign: "left",
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
   },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 8,
-    paddingHorizontal: 15,
+    paddingHorizontal: 4,
     borderBottomWidth: 1,
   },
 });

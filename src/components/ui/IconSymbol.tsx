@@ -14,6 +14,7 @@ const MAPPING = {
   "train.side.middle.car": "train",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
+  "chevron.left": "chevron-left",
   gear: "settings",
 } as Partial<
   Record<

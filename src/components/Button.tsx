@@ -5,7 +5,7 @@ import { StyleSheet } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
 type ButtonProps = ComponentProps<typeof HapticTab> & {
-  type?: "outline" | "ghost";
+  type?: "outline" | "ghost" | "icon";
 };
 
 const Button = ({ type = "outline", style, ...props }: ButtonProps) => {
@@ -27,6 +27,7 @@ const Button = ({ type = "outline", style, ...props }: ButtonProps) => {
         { borderColor },
         type === "outline" ? styles.outline : undefined,
         type === "ghost" ? styles.ghost : undefined,
+        type === "icon" ? styles.icon : undefined,
         style,
       ]}
     />
@@ -39,6 +40,10 @@ const styles = StyleSheet.create({
     margin: 8,
     padding: 8,
     borderRadius: 8,
+  },
+  icon: {
+    padding: 0,
+    margin: 0,
   },
   text: {
     textAlign: "center",

@@ -59,7 +59,11 @@ export default function RootLayout() {
         <PersistGate loading={null} persistor={persistor}>
           <ThemeProvider>
             <SafeAreaProvider>
-              <Stack>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                }}
+              >
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="+not-found" />
               </Stack>

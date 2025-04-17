@@ -43,3 +43,15 @@ export const getPublicTransportData = async () => {
 
   return publicTransportData;
 };
+
+export const getLineData = async (lineId: string) => {
+  await simulateCall({ errorMessage: "Failed to fetch line data" });
+
+  const lineData = publicTransportData.find((line) => line.line === lineId);
+
+  if (!lineData) {
+    throw new Error(`Line with id ${lineId} not found`);
+  }
+
+  return lineData;
+};

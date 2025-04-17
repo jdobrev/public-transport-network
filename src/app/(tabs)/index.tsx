@@ -33,6 +33,7 @@ import {
   RenderLine,
   RenderSectionHeader,
 } from "@/components-screens/index-components";
+import useMapPermissions from "@/hooks/useMapPermissions";
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
 
@@ -61,6 +62,7 @@ const RenderFilterToggle = React.memo(
 );
 
 export default function OverviewScreen() {
+  useMapPermissions();
   const viewType = useViewType();
   const setViewType = useSetViewType();
 
@@ -80,57 +82,6 @@ export default function OverviewScreen() {
     isError,
     refetch,
   } = useTransportData();
-
-  //TODO decide if we want to use this
-  // const filters = useMemo(
-  //   () =>
-  //     [
-  //       {
-  //         id: "viewType",
-  //         value: viewType === FILTER_VIEW_TYPE_VALUES.LIST,
-  //         label: viewTypeLabels[viewType],
-  //         toggle: () =>
-  //           setViewType(
-  //             viewType === FILTER_VIEW_TYPE_VALUES.LIST
-  //               ? FILTER_VIEW_TYPE_VALUES.MAP
-  //               : FILTER_VIEW_TYPE_VALUES.LIST
-  //           ),
-  //       },
-  //       {
-  //         id: "bus",
-  //         value: isBusShown,
-  //         label: "Bus",
-  //         toggle: toggleBusShown,
-  //       },
-  //       {
-  //         id: "trolleybus",
-  //         value: isTrolleybusShown,
-  //         label: "Trolleybus",
-  //         toggle: toggleTrolleybusShown,
-  //       },
-  //       {
-  //         id: "tram",
-  //         value: isTramShown,
-  //         label: "Tram",
-  //         toggle: toggleTramShown,
-  //       },
-  //     ] satisfies {
-  //       id: string;
-  //       value: boolean;
-  //       label: string;
-  //       toggle: () => void;
-  //     }[],
-  //   [
-  //     isBusShown,
-  //     isTramShown,
-  //     isTrolleybusShown,
-  //     setViewType,
-  //     toggleBusShown,
-  //     toggleTramShown,
-  //     toggleTrolleybusShown,
-  //     viewType,
-  //   ]
-  // );
 
   const busData = useMemo(
     () =>
@@ -223,16 +174,6 @@ export default function OverviewScreen() {
     <SafeAreaView>
       <Header>
         <Text type="title">Overview</Text>
-        {/* <FlatList
-          data={filters}
-          renderItem={({ item: { label, value, toggle } }) => (
-            <RenderFilterToggle label={label} value={value} toggle={toggle} />
-          )}
-          scrollEnabled={false}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.filtersContainer}
-          numColumns={2}
-        /> */}
         <RenderFilterToggle
           label="Interactive map"
           value={viewType === "map"}

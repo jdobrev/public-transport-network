@@ -1,6 +1,10 @@
 import { useMemo } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getVehicles, getPublicTransportData } from "./mock-api/api";
+import {
+  getVehicles,
+  getPublicTransportData,
+  getLineData,
+} from "./mock-api/api";
 import { PublicTransportData, TRANSPORT_TYPES, TransportType } from "@/types";
 
 export const useVehicles = () => {
@@ -52,4 +56,12 @@ export const useTransportData = () => {
     ...query,
     data: grouped,
   };
+};
+
+export const useLineData = (lineId: string) => {
+  return useQuery({
+    queryKey: ["lineData", lineId],
+    queryFn: () => getLineData(lineId),
+    retry: false, // This is to enable mock api errors
+  });
 };
