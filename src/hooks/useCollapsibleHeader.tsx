@@ -64,10 +64,26 @@ export function useCollapsibleHeader(headerHeight = DEFAULT_HEADER_HEIGHT) {
     };
   });
 
+  // Placeholder for the header to account for absolute position
+  // Place inside scrollable content
+  const PlaceholderHeader = ({
+    style,
+    ...props
+  }: ComponentProps<typeof View>) => (
+    <View
+      {...props}
+      style={[
+        {
+          height: headerHeight,
+          backgroundColor,
+        },
+        style,
+      ]}
+    />
+  );
+
   const Header = ({ children, style }: ComponentProps<Animated.View>) => (
     <>
-      {/* Placeholder for the header height to account for absolute position*/}
-      <View style={{ height: headerHeight }} />
       <Animated.View
         style={[
           headerAnimatedStyle,
@@ -83,6 +99,7 @@ export function useCollapsibleHeader(headerHeight = DEFAULT_HEADER_HEIGHT) {
 
   return {
     Header,
+    PlaceholderHeader,
     scrollHandler,
     expand: runOnUI(expand),
     collapse: runOnUI(collapse),

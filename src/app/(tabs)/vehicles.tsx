@@ -44,7 +44,7 @@ export default function VehiclesScreen() {
     isFetchingNextPage,
   } = useVehicles();
 
-  const { Header, scrollHandler } = useCollapsibleHeader();
+  const { Header, scrollHandler, PlaceholderHeader } = useCollapsibleHeader();
 
   const vehicles = useMemo(
     () => data?.pages.flatMap((page) => page.data) ?? [],
@@ -90,6 +90,7 @@ export default function VehiclesScreen() {
           }
         }}
         onEndReachedThreshold={dynamicThreshold}
+        ListHeaderComponent={<PlaceholderHeader />}
         ListFooterComponent={
           <View style={{ paddingBottom: tabBarHeight }}>
             {isFetchingNextPage ? <ActivityIndicator /> : null}

@@ -50,7 +50,8 @@ export default function OverviewScreen() {
   const transportFilter = useTransportFilter();
   const toggleTransportFilter = useToggleTransportFilter();
 
-  const { Header, scrollHandler } = useCollapsibleHeader(150);
+  const { Header, scrollHandler, PlaceholderHeader } =
+    useCollapsibleHeader(150);
 
   const filters = useMemo(
     () =>
@@ -109,7 +110,8 @@ export default function OverviewScreen() {
         />
       </Header>
       <Animated.ScrollView onScroll={scrollHandler}>
-        {/* {Array(20)
+        <PlaceholderHeader />
+        {Array(20)
           .fill(0)
           .map((_, i) => (
             <View key={i}>
@@ -117,7 +119,7 @@ export default function OverviewScreen() {
                 Lorem ipsum
               </Text>
             </View>
-          ))} */}
+          ))}
       </Animated.ScrollView>
     </SafeAreaView>
   );

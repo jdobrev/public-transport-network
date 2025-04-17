@@ -12,7 +12,7 @@ export default function Settings() {
   const isLight = colorScheme === "light";
   const setColorScheme = useSetColorScheme();
 
-  const { Header, scrollHandler } = useCollapsibleHeader();
+  const { Header, scrollHandler, PlaceholderHeader } = useCollapsibleHeader();
 
   return (
     <SafeAreaView>
@@ -20,6 +20,7 @@ export default function Settings() {
         <Text type="title">Settings</Text>
       </Header>
       <Animated.ScrollView onScroll={scrollHandler}>
+        <PlaceholderHeader />
         <View style={styles.settingsRow}>
           <Text>Dark theme</Text>
           {/**TODO fix bug where switch transition becomes 'choppy' after some time */}
