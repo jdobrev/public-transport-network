@@ -4,7 +4,6 @@ import {
   StyleSheet,
   SectionListData,
   SectionListRenderItemInfo,
-  FlatList,
   RefreshControl,
 } from "react-native";
 
@@ -27,10 +26,13 @@ import {
 
 import { SafeAreaView } from "@/components/SafeAreaView";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
-import Switch from "@/components/Switch";
 import { useTransportData } from "@/server/queries";
 import { GenericListError } from "@/components/Errors";
 import Checkbox from "@/components/Checkbox";
+import {
+  RenderLine,
+  RenderSectionHeader,
+} from "@/components-screens/index-components";
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
 
@@ -51,7 +53,7 @@ const RenderFilterToggle = React.memo(
   }) => {
     return (
       <View style={styles.filterRow}>
-        <Text>{label}</Text>
+        <Text type="subtitle">{label}</Text>
         <Checkbox checked={value} onCheckedChange={toggle} />
       </View>
     );
@@ -59,9 +61,8 @@ const RenderFilterToggle = React.memo(
 );
 
 export default function OverviewScreen() {
-  // TODO decide where to put this
-  // const viewType = useViewType();
-  // const setViewType = useSetViewType();
+  const viewType = useViewType();
+  const setViewType = useSetViewType();
 
   const isBusShown = useIsBusShown();
   const isTrolleybusShown = useIsTrolleybusShown();
@@ -71,7 +72,7 @@ export default function OverviewScreen() {
   const toggleTramShown = useToggleTramShown();
 
   const { Header, scrollHandler, PlaceholderHeader, headerHeight } =
-    useCollapsibleHeader();
+    useCollapsibleHeader(150);
 
   const {
     data: transportData,
@@ -131,52 +132,63 @@ export default function OverviewScreen() {
   //   ]
   // );
 
+  const busData = useMemo(
+    () =>
+      transportData?.A.map((item) => ({
+        id: item.line,
+        name: item.routes[0].name,
+      })) ?? [],
+    [transportData?.A]
+  );
+
+  const trolleybusData = useMemo(
+    () =>
+      transportData?.TB.map((item) => ({
+        id: item.line,
+        name: item.routes[0].name,
+      })) ?? [],
+    [transportData?.TB]
+  );
+  const tramData = useMemo(
+    () =>
+      transportData?.TM.map((item) => ({
+        id: item.line,
+        name: item.routes[0].name,
+      })) ?? [],
+    [transportData?.TM]
+  );
+
   const sections = useMemo(() => {
     return [
       {
         title: "Bus",
-        data: isBusShown
-          ? transportData?.A.map((item) => ({
-              id: item.line,
-              name: item.routes[0].name,
-            })) ?? []
-          : [],
+        data: isBusShown ? busData : [],
         filterValue: isBusShown,
         toggle: toggleBusShown,
       },
       {
         title: "Trolleybus",
-        data: isTrolleybusShown
-          ? transportData?.TB.map((item) => ({
-              id: item.line,
-              name: item.routes[0].name,
-            })) ?? []
-          : [],
+        data: isTrolleybusShown ? trolleybusData : [],
         filterValue: isTrolleybusShown,
         toggle: toggleTrolleybusShown,
       },
       {
         title: "Tram",
-        data: isTramShown
-          ? transportData?.TM.map((item) => ({
-              id: item.line,
-              name: item.routes[0].name,
-            })) ?? []
-          : [],
+        data: isTramShown ? tramData : [],
         filterValue: isTramShown,
         toggle: toggleTramShown,
       },
     ];
   }, [
+    busData,
+    tramData,
+    trolleybusData,
     isBusShown,
     isTramShown,
     isTrolleybusShown,
     toggleBusShown,
     toggleTramShown,
     toggleTrolleybusShown,
-    transportData?.A,
-    transportData?.TB,
-    transportData?.TM,
   ]);
 
   const renderItem = useCallback(
@@ -186,16 +198,7 @@ export default function OverviewScreen() {
       (typeof sections)[number]["data"][number]
     >) => {
       if (isError) return null;
-      return (
-        <View
-          style={{
-            padding: 15,
-            borderBottomWidth: 1,
-          }}
-        >
-          <Text>{item.name}</Text>
-        </View>
-      );
+      return <RenderLine id={item.id} name={item.name} />;
     },
     [isError]
   );
@@ -206,24 +209,11 @@ export default function OverviewScreen() {
     }: SectionListData<(typeof sections)[number]["data"][number]>) => {
       if (isError) return null;
       return (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            // backgroundColor: "#eee",
-            paddingVertical: 8,
-            paddingHorizontal: 15,
-            borderBottomWidth: 1,
-            // borderColor: "#ccc",
-          }}
-        >
-          <Text type="title">{section.title}</Text>
-          <Checkbox
-            checked={section.filterValue}
-            onCheckedChange={section.toggle}
-          />
-        </View>
+        <RenderSectionHeader
+          filterValue={section.filterValue}
+          toggle={section.toggle}
+          title={section.title}
+        />
       );
     },
     [isError]
@@ -243,6 +233,17 @@ export default function OverviewScreen() {
           contentContainerStyle={styles.filtersContainer}
           numColumns={2}
         /> */}
+        <RenderFilterToggle
+          label="Interactive map"
+          value={viewType === "map"}
+          toggle={() => {
+            setViewType(
+              viewType === FILTER_VIEW_TYPE_VALUES.LIST
+                ? FILTER_VIEW_TYPE_VALUES.MAP
+                : FILTER_VIEW_TYPE_VALUES.LIST
+            );
+          }}
+        />
       </Header>
       <AnimatedSectionList
         ListHeaderComponent={
@@ -277,9 +278,12 @@ const styles = StyleSheet.create({
   },
   filterRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     alignItems: "center",
+    alignSelf: "flex-start",
     paddingHorizontal: 15,
-    width: 150,
+    paddingTop: 20,
+    width: 250,
+    gap: 10,
   },
 });

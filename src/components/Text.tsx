@@ -15,7 +15,8 @@ export type TextProps = ReactNativeTextProps & {
     | "title"
     | "defaultSemiBold"
     | "subtitle"
-    | "link";
+    | "link"
+    | "small";
 };
 
 export function Text({
@@ -39,6 +40,7 @@ export function Text({
         type === "faded" ? styles.default : undefined,
         type === "title" ? styles.title : undefined,
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
+        type === "small" ? styles.small : undefined,
         type === "subtitle" ? styles.subtitle : undefined,
         type === "link" ? styles.link : undefined,
         style,
@@ -57,6 +59,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     fontWeight: "600",
+  },
+  small: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   title: {
     fontSize: 32,

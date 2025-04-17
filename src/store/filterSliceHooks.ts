@@ -55,3 +55,27 @@ export const useToggleTramShown = () => {
 
   return toggleTram;
 };
+
+export const useHiddenLines = () =>
+  useAppSelector((state) => state.filter.hiddenLines);
+
+export const useHiddenLineById = (lineId: string) =>
+  useAppSelector((state) => state.filter.hiddenLines?.[lineId]);
+
+export const useToggleLine = () => {
+  const dispatch = useAppDispatch();
+  const toggleLine = (lineId: string) => {
+    dispatch(filterSlice.actions.toggleLine(lineId));
+  };
+
+  return toggleLine;
+};
+
+export const useToggleLineById = (lineId: string) => {
+  const dispatch = useAppDispatch();
+  const toggleLine = () => {
+    dispatch(filterSlice.actions.toggleLine(lineId));
+  };
+
+  return toggleLine;
+};
