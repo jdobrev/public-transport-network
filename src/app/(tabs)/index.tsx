@@ -50,7 +50,7 @@ export default function OverviewScreen() {
   const transportFilter = useTransportFilter();
   const toggleTransportFilter = useToggleTransportFilter();
 
-  const { Header, scrollHandler } = useCollapsibleHeader();
+  const { Header, scrollHandler } = useCollapsibleHeader(150);
 
   const filters = useMemo(
     () =>
@@ -97,16 +97,17 @@ export default function OverviewScreen() {
     <SafeAreaView>
       <Header>
         <Text type="title">Overview</Text>
+        <FlatList
+          data={filters}
+          renderItem={({ item: { label, value, toggle } }) => (
+            <RenderFilterToggle label={label} value={value} toggle={toggle} />
+          )}
+          scrollEnabled={false}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.filtersContainer}
+          numColumns={2}
+        />
       </Header>
-      {/* <View style={{ height: 50 }} /> */}
-      <FlatList
-        data={filters}
-        renderItem={({ item: { label, value, toggle } }) => (
-          <RenderFilterToggle label={label} value={value} toggle={toggle} />
-        )}
-        scrollEnabled={false}
-        showsVerticalScrollIndicator={false}
-      />
       <Animated.ScrollView onScroll={scrollHandler}>
         {/* {Array(20)
           .fill(0)
@@ -123,10 +124,16 @@ export default function OverviewScreen() {
 }
 
 const styles = StyleSheet.create({
+  filtersContainer: {
+    flexDirection: "column",
+    gap: 10,
+    justifyContent: "center",
+  },
   filterRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 60,
+    paddingHorizontal: 15,
+    width: 150,
   },
 });

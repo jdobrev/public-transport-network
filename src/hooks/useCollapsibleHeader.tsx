@@ -20,10 +20,9 @@ const EXPANDED = 0;
 const EXPAND_THRESHOLD = 16; // pixels to scroll up before expanding
 const ANIMATION_DURATION = 150;
 
-export function useCollapsibleHeader() {
+export function useCollapsibleHeader(headerHeight = DEFAULT_HEADER_HEIGHT) {
   const backgroundColor = useThemeColor({}, "background");
   const { top } = useSafeAreaInsets();
-  const totalHeaderHeight = DEFAULT_HEADER_HEIGHT;
 
   const headerState = useSharedValue(EXPANDED);
   const prevScrollY = useSharedValue(0);
@@ -44,7 +43,7 @@ export function useCollapsibleHeader() {
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       const y = event.contentOffset.y;
-      if (y > prevScrollY.value && y > DEFAULT_HEADER_HEIGHT) {
+      if (y > prevScrollY.value && y > headerHeight) {
         // Scrolling down
         collapse();
       } else if (
@@ -61,15 +60,14 @@ export function useCollapsibleHeader() {
   const headerAnimatedStyle = useAnimatedStyle(() => {
     return {
       height:
-        DEFAULT_HEADER_HEIGHT -
-        (DEFAULT_HEADER_HEIGHT - COLLAPSED_HEIGHT) * headerState.value,
+        headerHeight - (headerHeight - COLLAPSED_HEIGHT) * headerState.value,
     };
   });
 
   const Header = ({ children, style }: ComponentProps<Animated.View>) => (
     <>
       {/* Placeholder for the header height to account for absolute position*/}
-      <View style={{ height: totalHeaderHeight }} />
+      <View style={{ height: headerHeight }} />
       <Animated.View
         style={[
           headerAnimatedStyle,
@@ -88,8 +86,7 @@ export function useCollapsibleHeader() {
     scrollHandler,
     expand: runOnUI(expand),
     collapse: runOnUI(collapse),
-    HEADER_HEIGHT: DEFAULT_HEADER_HEIGHT,
-    totalHeaderHeight,
+    headerHeight,
   };
 }
 
