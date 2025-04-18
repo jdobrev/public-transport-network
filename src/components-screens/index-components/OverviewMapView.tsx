@@ -82,41 +82,6 @@ const OverviewMapView = React.memo(
       [getColor, onPressLine, routesToRender]
     );
 
-    const renderMapView = useMemo(
-      () => (
-        <View style={styles.flex}>
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.flex}
-            initialRegion={initialRegion}
-            showsUserLocation
-          >
-            {renderLines}
-          </MapView>
-          <TouchableOpacity
-            style={[
-              styles.filterIcon,
-              { backgroundColor: iconBackgroundColor },
-            ]}
-            onPress={onPressFilter}
-          >
-            <IconSymbol
-              name={ICON_SYMBOLS.FILTER}
-              size={24}
-              color={iconColor}
-            />
-          </TouchableOpacity>
-        </View>
-      ),
-      [
-        iconBackgroundColor,
-        iconColor,
-        initialRegion,
-        onPressFilter,
-        renderLines,
-      ]
-    );
-
     if (routesToRender.length === 0) {
       return (
         <View style={styles.center}>
@@ -125,7 +90,24 @@ const OverviewMapView = React.memo(
       );
     }
 
-    return renderMapView;
+    return (
+      <View style={styles.flex}>
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.flex}
+          initialRegion={initialRegion}
+          showsUserLocation
+        >
+          {renderLines}
+        </MapView>
+        <TouchableOpacity
+          style={[styles.filterIcon, { backgroundColor: iconBackgroundColor }]}
+          onPress={onPressFilter}
+        >
+          <IconSymbol name={ICON_SYMBOLS.FILTER} size={24} color={iconColor} />
+        </TouchableOpacity>
+      </View>
+    );
   }
 );
 
