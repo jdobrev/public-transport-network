@@ -1,6 +1,8 @@
+import { Text } from "@/components/Text";
 import { ICON_SYMBOLS, IconSymbol } from "@/components/ui/IconSymbol";
 import { View } from "@/components/View";
 import { useShownLines } from "@/hooks/useShownLines";
+import { useThemeColor } from "@/hooks/useThemeColor";
 import React, { useMemo } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import MapView, { Polyline, PROVIDER_GOOGLE, Region } from "react-native-maps";
@@ -15,8 +17,14 @@ const OverviewMapView = React.memo(
   }) => {
     const linesOnMap = useShownLines();
 
+    const busColor = useThemeColor({}, "busColor");
+    const trolleybusColor = useThemeColor({}, "trolleybusColor");
+    const tramColor = useThemeColor({}, "tramColor");
+    const iconColor = useThemeColor({}, "icon");
+    const iconBackgroundColor = useThemeColor({}, "iconBackground");
+
     const getColor = (t: string) =>
-      t === "A" ? "#007AFF" : t === "TB" ? "#32A900" : "#FF375F";
+      t === "A" ? busColor : t === "TB" ? trolleybusColor : tramColor;
 
     const initialRegion: Region = useMemo(() => {
       const first = linesOnMap[0]?.routes[0].stops[0].location;
@@ -36,8 +44,16 @@ const OverviewMapView = React.memo(
       };
     }, [linesOnMap]);
 
+    if (linesOnMap.length === 0) {
+      return (
+        <View style={styles.center}>
+          <Text>No lines selected</Text>
+        </View>
+      );
+    }
+
     return (
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
         <MapView
           provider={PROVIDER_GOOGLE}
           style={styles.flex}
@@ -63,18 +79,10 @@ const OverviewMapView = React.memo(
           )}
         </MapView>
         <TouchableOpacity
-          style={{
-            position: "absolute",
-            bottom: 16,
-            right: 16,
-            backgroundColor: "#007AFF",
-            padding: 12,
-            borderRadius: 24,
-            elevation: 4,
-          }}
+          style={[styles.filterIcon, { backgroundColor: iconBackgroundColor }]}
           onPress={onPressFilter}
         >
-          <IconSymbol name={ICON_SYMBOLS.FILTER} size={24} color="#fff" />
+          <IconSymbol name={ICON_SYMBOLS.FILTER} size={24} color={iconColor} />
         </TouchableOpacity>
       </View>
     );
@@ -84,6 +92,19 @@ const OverviewMapView = React.memo(
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  filterIcon: {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
+    padding: 12,
+    borderRadius: 24,
+    elevation: 4,
   },
 });
 

@@ -6,6 +6,7 @@
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/store/settingsSliceHooks";
 
+//TODO make colorName first param and props second optional param
 export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
