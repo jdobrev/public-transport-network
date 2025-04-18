@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { ComponentProps } from "react";
 import Button from "@/components/Button";
-import { IconSymbol } from "@/components//ui/IconSymbol";
+import { ICON_SYMBOLS, IconSymbol } from "@/components//ui/IconSymbol";
 import { StyleSheet } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
@@ -20,7 +20,7 @@ export default function BackButton({
       hitSlop={10}
       type="icon"
     >
-      <IconSymbol name="chevron.left" size={32} color={color} />
+      <IconSymbol name={ICON_SYMBOLS.CHEVRON_LEFT} size={32} color={color} />
     </Button>
   );
 }

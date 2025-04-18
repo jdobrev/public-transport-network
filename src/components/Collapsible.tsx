@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { Text } from "@/components/Text";
 import { View } from "@/components/View";
-import { IconSymbol } from "@/components/ui/IconSymbol";
+import { ICON_SYMBOLS, IconSymbol } from "@/components/ui/IconSymbol";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/store/settingsSliceHooks";
 
@@ -22,7 +22,7 @@ export function Collapsible({
         activeOpacity={0.8}
       >
         <IconSymbol
-          name="chevron.right"
+          name={ICON_SYMBOLS.CHEVRON_RIGHT}
           size={18}
           weight="medium"
           color={theme === "light" ? Colors.light.icon : Colors.dark.icon}

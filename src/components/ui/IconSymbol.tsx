@@ -15,6 +15,7 @@ const MAPPING = {
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
   "chevron.left": "chevron-left",
+  "camera.filters": "filter",
   gear: "settings",
 } as Partial<
   Record<
@@ -24,6 +25,14 @@ const MAPPING = {
 >;
 
 export type IconSymbolName = keyof typeof MAPPING;
+export const ICON_SYMBOLS = {
+  HOME: "house.fill",
+  TRAIN: "train.side.middle.car",
+  CHEVRON_LEFT: "chevron.left",
+  CHEVRON_RIGHT: "chevron.right",
+  FILTER: "camera.filters",
+  SETTINGS: "gear",
+} satisfies Record<string, IconSymbolName>;
 
 /**
  * An icon component that uses native SFSymbols on iOS, and MaterialIcons on Android and web. This ensures a consistent look across platforms, and optimal resource usage.
