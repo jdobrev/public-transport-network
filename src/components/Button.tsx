@@ -15,7 +15,7 @@ const Button = ({ type = "outline", style, ...props }: ButtonProps) => {
     ) : (
       props.children
     );
-  const borderColor = useThemeColor({}, "text");
+  const primaryColor = useThemeColor({}, "primary");
 
   return (
     //TODO check how it works on iOS
@@ -24,7 +24,7 @@ const Button = ({ type = "outline", style, ...props }: ButtonProps) => {
       children={children}
       style={[
         styles.base,
-        { borderColor },
+        { borderColor: primaryColor },
         type === "outline" ? styles.outline : undefined,
         type === "ghost" ? styles.ghost : undefined,
         type === "icon" ? styles.icon : undefined,

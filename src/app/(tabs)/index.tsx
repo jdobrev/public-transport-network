@@ -1,16 +1,12 @@
 import React, { useCallback, useMemo } from "react";
 import {
-  SectionList,
   StyleSheet,
   SectionListData,
   SectionListRenderItemInfo,
   RefreshControl,
 } from "react-native";
 
-import Animated from "react-native-reanimated";
-
 import { Text } from "@/components/Text";
-import { View } from "@/components/View";
 import { FILTER_VIEW_TYPE_VALUES } from "@/store/filterSlice";
 
 import {
@@ -28,38 +24,27 @@ import { SafeAreaView } from "@/components/SafeAreaView";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { useTransportData } from "@/server/queries";
 import { GenericListError } from "@/components/Errors";
-import Checkbox from "@/components/Checkbox";
 import {
   RenderLine,
   RenderSectionHeader,
 } from "@/components-screens/index-components";
 import useMapPermissions from "@/hooks/useMapPermissions";
+import ButtonSwitch from "@/components/Button-switch";
 
-const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
+import AnimatedSectionList from "@/components/AnimatedSectionList";
 
 const viewTypeLabels = {
   [FILTER_VIEW_TYPE_VALUES.LIST]: "List",
   [FILTER_VIEW_TYPE_VALUES.MAP]: "Map",
 };
 
-const RenderFilterToggle = React.memo(
-  ({
-    label,
-    value,
-    toggle,
-  }: {
-    label: string;
-    value: boolean;
-    toggle: () => void;
-  }) => {
-    return (
-      <View style={styles.filterRow}>
-        <Text type="subtitle">{label}</Text>
-        <Checkbox checked={value} onCheckedChange={toggle} />
-      </View>
-    );
-  }
-);
+type SectionItem = { id: string; name: string };
+type Section = {
+  title: string;
+  data: SectionItem[];
+  filterValue: boolean;
+  toggle: () => void;
+};
 
 export default function OverviewScreen() {
   useMapPermissions();
@@ -109,7 +94,7 @@ export default function OverviewScreen() {
     [transportData?.TM]
   );
 
-  const sections = useMemo(() => {
+  const sections: Section[] = useMemo(() => {
     return [
       {
         title: "Bus",
@@ -143,11 +128,7 @@ export default function OverviewScreen() {
   ]);
 
   const renderItem = useCallback(
-    ({
-      item,
-    }: SectionListRenderItemInfo<
-      (typeof sections)[number]["data"][number]
-    >) => {
+    (item: SectionItem) => {
       if (isError) return null;
       return <RenderLine id={item.id} name={item.name} />;
     },
@@ -155,9 +136,7 @@ export default function OverviewScreen() {
   );
 
   const renderSectionHeader = useCallback(
-    ({
-      section,
-    }: SectionListData<(typeof sections)[number]["data"][number]>) => {
+    (section: Section) => {
       if (isError) return null;
       return (
         <RenderSectionHeader
@@ -174,19 +153,20 @@ export default function OverviewScreen() {
     <SafeAreaView>
       <Header>
         <Text type="title">Overview</Text>
-        <RenderFilterToggle
-          label="Interactive map"
-          value={viewType === "map"}
-          toggle={() => {
+        <ButtonSwitch
+          valueLeft={viewType === FILTER_VIEW_TYPE_VALUES.LIST}
+          textLeft={viewTypeLabels[FILTER_VIEW_TYPE_VALUES.LIST]}
+          textRight={viewTypeLabels[FILTER_VIEW_TYPE_VALUES.MAP]}
+          onValueLeftChange={(newVal) => {
             setViewType(
-              viewType === FILTER_VIEW_TYPE_VALUES.LIST
-                ? FILTER_VIEW_TYPE_VALUES.MAP
-                : FILTER_VIEW_TYPE_VALUES.LIST
+              newVal
+                ? FILTER_VIEW_TYPE_VALUES.LIST
+                : FILTER_VIEW_TYPE_VALUES.MAP
             );
           }}
         />
       </Header>
-      <AnimatedSectionList
+      <AnimatedSectionList<SectionItem, Section>
         ListHeaderComponent={
           <>
             <PlaceholderHeader />
@@ -195,8 +175,8 @@ export default function OverviewScreen() {
         }
         sections={sections}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
+        renderItem={({ item }) => renderItem(item)}
+        renderSectionHeader={({ section }) => renderSectionHeader(section)}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         refreshControl={
