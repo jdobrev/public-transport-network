@@ -1,10 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import {
-  StyleSheet,
-  SectionListData,
-  SectionListRenderItemInfo,
-  RefreshControl,
-} from "react-native";
+import { StyleSheet, RefreshControl } from "react-native";
 
 import { Text } from "@/components/Text";
 import { FILTER_VIEW_TYPE_VALUES } from "@/store/filterSlice";
