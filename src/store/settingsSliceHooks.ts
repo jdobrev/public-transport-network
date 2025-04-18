@@ -17,3 +17,23 @@ export const useSetColorScheme = () => {
   };
   return setColorScheme;
 };
+
+export const useFetchDelay = () =>
+  useAppSelector((state) => state.settings.fetchDelay);
+export const useSetFetchDelay = () => {
+  const dispatch = useAppDispatch();
+  const setFetchDelay = (fetchDelay: string) => {
+    dispatch(settingsSlice.actions.setFetchDelay(fetchDelay));
+  };
+  return setFetchDelay;
+};
+
+export const useErrorChance = () =>
+  useAppSelector((state) => state.settings.errorChance);
+export const useSetErrorChance = () => {
+  const dispatch = useAppDispatch();
+  const setErrorChance = (errorChance: string) => {
+    dispatch(settingsSlice.actions.setErrorChance(errorChance));
+  };
+  return setErrorChance;
+};

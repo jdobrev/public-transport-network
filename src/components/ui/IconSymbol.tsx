@@ -15,7 +15,7 @@ const MAPPING = {
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
   "chevron.left": "chevron-left",
-  "camera.filters": "filter",
+  "camera.filters": "filter-list",
   gear: "settings",
 } as Partial<
   Record<

@@ -1,38 +1,40 @@
-import { StyleSheet } from "react-native";
+import React, { ComponentProps } from "react";
+import { View, StyleSheet } from "react-native";
 import Button from "./Button";
-import { View } from "./View";
 
-export default function ButtonSwitch({
-  valueLeft,
-  textLeft,
-  textRight,
-  onValueLeftChange,
-}: {
-  valueLeft: boolean;
-  textLeft: string;
-  textRight: string;
-  onValueLeftChange: (newVal: boolean) => void;
-}) {
+type ButtonSwitchOption<T extends string> = {
+  id: T;
+  label: string;
+};
+
+type ButtonSwitchProps<T extends string> = {
+  selectedOptionId: T;
+  options: ButtonSwitchOption<T>[];
+  onValueChange: (newValueId: T) => void;
+  containerStyle?: ComponentProps<typeof View>["style"];
+  buttonStyle?: ComponentProps<typeof Button>["style"];
+};
+
+export default function ButtonSwitch<T extends string>({
+  selectedOptionId,
+  options,
+  onValueChange,
+  containerStyle,
+  buttonStyle,
+}: ButtonSwitchProps<T>) {
   return (
-    <View style={styles.container}>
-      <Button
-        disabled={valueLeft}
-        onPress={() => {
-          onValueLeftChange(true);
-        }}
-        type={valueLeft ? "outline" : "ghost"}
-      >
-        {textLeft}
-      </Button>
-      <Button
-        disabled={!valueLeft}
-        onPress={() => {
-          onValueLeftChange(false);
-        }}
-        type={!valueLeft ? "outline" : "ghost"}
-      >
-        {textRight}
-      </Button>
+    <View style={[styles.container, containerStyle]}>
+      {options.map((option) => (
+        <Button
+          key={option.id}
+          disabled={option.id === selectedOptionId}
+          onPressIn={() => onValueChange(option.id)}
+          type={option.id === selectedOptionId ? "outline" : "ghost"}
+          style={[styles.button, buttonStyle]}
+        >
+          {option.label}
+        </Button>
+      ))}
     </View>
   );
 }
@@ -40,8 +42,8 @@ export default function ButtonSwitch({
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
+  },
+  button: {
+    flex: 1,
   },
 });

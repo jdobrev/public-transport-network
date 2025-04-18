@@ -1,18 +1,44 @@
 import vehicles from "./vehicles.json";
 import publicTransportData from "./public-transport-data.json";
+import { store } from "@/store/store";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-//TODO maybe add delay/error chance to settings?
 const simulateCall = async ({
-  delay = 750,
   errorMessage: message,
-  errorChance = 0.2,
 }: {
   errorMessage: string;
-  errorChance?: number;
-  delay?: number;
 }) => {
+  const state = store.getState();
+
+  let delay = 250;
+  let errorChance = 0.2;
+
+  const fetchDelayFromStore = state?.settings?.fetchDelay
+    ? parseInt(state.settings.fetchDelay)
+    : null;
+  const errorChanceFromStore = state?.settings?.errorChance
+    ? parseFloat(state.settings.errorChance)
+    : null;
+
+  if (
+    fetchDelayFromStore !== null &&
+    !isNaN(fetchDelayFromStore) &&
+    fetchDelayFromStore >= 0 &&
+    fetchDelayFromStore <= 20000
+  ) {
+    delay = fetchDelayFromStore;
+  }
+
+  if (
+    errorChanceFromStore !== null &&
+    !isNaN(errorChanceFromStore) &&
+    errorChanceFromStore >= 0 &&
+    errorChanceFromStore <= 1
+  ) {
+    errorChance = errorChanceFromStore;
+  }
+
   await sleep(delay);
   if (Math.random() < errorChance) throw new Error(message);
 };

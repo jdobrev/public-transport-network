@@ -1,18 +1,103 @@
-import Checkbox from "@/components/Checkbox";
+import ButtonSwitch from "@/components/Button-switch";
 import { SafeAreaView } from "@/components/SafeAreaView";
 import { Text } from "@/components/Text";
 import { View } from "@/components/View";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
-import { useColorScheme, useSetColorScheme } from "@/store/settingsSliceHooks";
+import {
+  useColorScheme,
+  useErrorChance,
+  useFetchDelay,
+  useSetColorScheme,
+  useSetErrorChance,
+  useSetFetchDelay,
+} from "@/store/settingsSliceHooks";
+import { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 
 export default function Settings() {
   const colorScheme = useColorScheme();
-  const isLight = colorScheme === "light";
   const setColorScheme = useSetColorScheme();
 
+  const fetchDelay = useFetchDelay();
+  const setFetchDelay = useSetFetchDelay();
+
+  const errorChance = useErrorChance();
+  const setErrorChance = useSetErrorChance();
+
   const { Header, scrollHandler, PlaceholderHeader } = useCollapsibleHeader();
+
+  const settings = useMemo(
+    () => [
+      {
+        name: "Theme",
+        options: [
+          {
+            id: "light",
+            label: "Light",
+          },
+          {
+            id: "dark",
+            label: "Dark",
+          },
+        ],
+        selectedOptionId: colorScheme,
+        onValueChange: (newVal: string) => {
+          setColorScheme(newVal === "light" ? "light" : "dark");
+        },
+      },
+      {
+        name: "Fetch delay (ms)",
+        options: [
+          {
+            id: "250",
+            label: "250",
+          },
+          {
+            id: "750",
+            label: "750",
+          },
+          {
+            id: "2000",
+            label: "2000",
+          },
+        ],
+        selectedOptionId: fetchDelay,
+        onValueChange: (newVal: string) => {
+          setFetchDelay(newVal);
+        },
+      },
+      {
+        name: "Fetch error chance",
+        options: [
+          {
+            id: "0",
+            label: "0%",
+          },
+          {
+            id: "0.2",
+            label: "20%",
+          },
+          {
+            id: "1",
+            label: "100%",
+          },
+        ],
+        selectedOptionId: errorChance,
+        onValueChange: (newVal: string) => {
+          setErrorChance(newVal);
+        },
+      },
+    ],
+    [
+      colorScheme,
+      errorChance,
+      fetchDelay,
+      setColorScheme,
+      setErrorChance,
+      setFetchDelay,
+    ]
+  );
 
   return (
     <SafeAreaView>
@@ -21,15 +106,19 @@ export default function Settings() {
       </Header>
       <Animated.ScrollView onScroll={scrollHandler}>
         <PlaceholderHeader />
-        <View style={styles.settingsRow}>
-          <Text>Dark theme</Text>
-          <Checkbox
-            checked={!isLight}
-            onCheckedChange={() => {
-              setColorScheme(isLight ? "dark" : "light");
-            }}
-          />
-        </View>
+        {settings.map((setting) => (
+          <View key={setting.name} style={styles.settingsRow}>
+            <Text>{setting.name}</Text>
+            <ButtonSwitch
+              selectedOptionId={setting.selectedOptionId}
+              options={setting.options}
+              onValueChange={(newVal: string) => {
+                setting.onValueChange(newVal);
+              }}
+              containerStyle={styles.buttonsContainer}
+            />
+          </View>
+        ))}
       </Animated.ScrollView>
     </SafeAreaView>
   );
@@ -40,15 +129,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 60,
+    paddingHorizontal: 15,
   },
-  dummyRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 60,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+  buttonsContainer: {
+    maxWidth: 250,
   },
 });
