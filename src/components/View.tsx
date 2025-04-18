@@ -1,11 +1,8 @@
-import {
-  View as ReactNativeView,
-  type ViewProps as ReactNativeViewProps,
-} from "react-native";
+import { View as RNView, type ViewProps as RNViewProps } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
 
-export type ViewProps = ReactNativeViewProps & {
+export type ViewProps = RNViewProps & {
   lightColor?: string;
   darkColor?: string;
 };
@@ -21,7 +18,5 @@ export function View({
     "background"
   );
 
-  return (
-    <ReactNativeView style={[{ backgroundColor }, style]} {...otherProps} />
-  );
+  return <RNView style={[{ backgroundColor }, style]} {...otherProps} />;
 }

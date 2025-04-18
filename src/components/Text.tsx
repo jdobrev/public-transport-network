@@ -1,12 +1,12 @@
 import {
-  Text as ReactNativeText,
-  type TextProps as ReactNativeTextProps,
+  Text as RNText,
+  type TextProps as RNTextProps,
   StyleSheet,
 } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
 
-export type TextProps = ReactNativeTextProps & {
+export type TextProps = RNTextProps & {
   lightColor?: string;
   darkColor?: string;
   type?:
@@ -33,7 +33,7 @@ export function Text({
   );
 
   return (
-    <ReactNativeText
+    <RNText
       style={[
         { color: type === "faded" ? colorFaded : color },
         type === "default" ? styles.default : undefined,

@@ -1,10 +1,10 @@
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
-  ActivityIndicator as ReactNativeActivityIndicator,
-  ActivityIndicatorProps as ReactNativeActivityIndicatorProps,
+  ActivityIndicator as RNActivityIndicator,
+  ActivityIndicatorProps as RNActivityIndicatorProps,
 } from "react-native";
 
-type ActivityIndicatorProps = ReactNativeActivityIndicatorProps & {
+type ActivityIndicatorProps = RNActivityIndicatorProps & {
   lightColor?: string;
   darkColor?: string;
   backgroundLightColor?: string;
@@ -27,7 +27,7 @@ export default function ActivityIndicator({
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
   return (
-    <ReactNativeActivityIndicator
+    <RNActivityIndicator
       size="small"
       color={color}
       style={[
