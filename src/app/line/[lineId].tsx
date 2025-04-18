@@ -69,6 +69,8 @@ export default function LineDetails() {
   const { Header, PlaceholderHeader, scrollHandler, headerHeight } =
     useCollapsibleHeader();
 
+  //TODO Handle Loading/Error
+
   return (
     <SafeAreaView>
       <Header style={styles.headerInner}>
