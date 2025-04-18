@@ -3,7 +3,7 @@ import { ICON_SYMBOLS, IconSymbol } from "@/components/ui/IconSymbol";
 import { View } from "@/components/View";
 import { useShownLines } from "@/hooks/useShownLines";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import MapView, { Polyline, PROVIDER_GOOGLE, Region } from "react-native-maps";
 
@@ -23,8 +23,31 @@ const OverviewMapView = React.memo(
     const iconColor = useThemeColor({}, "icon");
     const iconBackgroundColor = useThemeColor({}, "iconBackground");
 
-    const getColor = (t: string) =>
-      t === "A" ? busColor : t === "TB" ? trolleybusColor : tramColor;
+    const getColor = useCallback(
+      (t: string) =>
+        t === "A" ? busColor : t === "TB" ? trolleybusColor : tramColor,
+      [busColor, tramColor, trolleybusColor]
+    );
+
+    const routesToRender = useMemo(() => {
+      return linesOnMap.flatMap((line) =>
+        line.routes.map((route) => {
+          // merge all segments' coordinates into one array so we can draw a single polyline
+          const coords = route.segments.flatMap((seg) =>
+            seg.coordinates.map((c) => ({
+              latitude: c.lat,
+              longitude: c.lon,
+            }))
+          );
+          return {
+            lineId: line.line,
+            routeId: route.id,
+            transportType: route.transportType,
+            coords,
+          };
+        })
+      );
+    }, [linesOnMap]);
 
     const initialRegion: Region = useMemo(() => {
       const first = linesOnMap[0]?.routes[0].stops[0].location;
@@ -44,7 +67,57 @@ const OverviewMapView = React.memo(
       };
     }, [linesOnMap]);
 
-    if (linesOnMap.length === 0) {
+    const renderLines = useMemo(
+      () =>
+        routesToRender.map((r) => (
+          <Polyline
+            key={r.routeId}
+            coordinates={r.coords}
+            strokeColor={getColor(r.transportType)}
+            strokeWidth={10}
+            tappable
+            onPress={() => onPressLine(r.lineId)}
+          />
+        )),
+      [getColor, onPressLine, routesToRender]
+    );
+
+    const renderMapView = useMemo(
+      () => (
+        <View style={styles.flex}>
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={styles.flex}
+            initialRegion={initialRegion}
+            showsUserLocation
+          >
+            {renderLines}
+          </MapView>
+          <TouchableOpacity
+            style={[
+              styles.filterIcon,
+              { backgroundColor: iconBackgroundColor },
+            ]}
+            onPress={onPressFilter}
+          >
+            <IconSymbol
+              name={ICON_SYMBOLS.FILTER}
+              size={24}
+              color={iconColor}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+      [
+        iconBackgroundColor,
+        iconColor,
+        initialRegion,
+        onPressFilter,
+        renderLines,
+      ]
+    );
+
+    if (routesToRender.length === 0) {
       return (
         <View style={styles.center}>
           <Text>No lines selected</Text>
@@ -52,40 +125,7 @@ const OverviewMapView = React.memo(
       );
     }
 
-    return (
-      <View style={styles.flex}>
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.flex}
-          initialRegion={initialRegion}
-          showsUserLocation
-        >
-          {linesOnMap.map((line) =>
-            line.routes.map((route) =>
-              route.segments.map((seg) => (
-                <Polyline
-                  key={seg.id}
-                  coordinates={seg.coordinates.map((c) => ({
-                    latitude: c.lat,
-                    longitude: c.lon,
-                  }))}
-                  strokeColor={getColor(route.transportType)}
-                  strokeWidth={4}
-                  tappable
-                  onPress={() => onPressLine(line.line)}
-                />
-              ))
-            )
-          )}
-        </MapView>
-        <TouchableOpacity
-          style={[styles.filterIcon, { backgroundColor: iconBackgroundColor }]}
-          onPress={onPressFilter}
-        >
-          <IconSymbol name={ICON_SYMBOLS.FILTER} size={24} color={iconColor} />
-        </TouchableOpacity>
-      </View>
-    );
+    return renderMapView;
   }
 );
 
