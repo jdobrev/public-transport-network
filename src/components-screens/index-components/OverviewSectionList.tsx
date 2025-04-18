@@ -17,6 +17,7 @@ import {
   useToggleTrolleybusShown,
 } from "@/store/filterSliceHooks";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 type SectionItem = { id: string; name: string };
 type Section = {
@@ -24,6 +25,7 @@ type Section = {
   data: SectionItem[];
   filterValue: boolean;
   toggle: () => void;
+  color: string;
 };
 
 const RenderLine = React.memo(
@@ -62,14 +64,19 @@ const RenderSectionHeader = React.memo(
     title,
     filterValue,
     toggle,
+    color,
   }: {
     title: string;
     filterValue: boolean;
+    color?: string;
     toggle: () => void;
   }) => {
     return (
       <View style={styles.sectionHeader}>
         <Text type="title">{title}</Text>
+        <View
+          style={{ ...styles.colorHorizontalStripe, backgroundColor: color }}
+        />
         <Checkbox checked={filterValue} onCheckedChange={toggle} />
       </View>
     );
@@ -97,6 +104,10 @@ export default React.memo(function OverviewSectionList({
   const toggleBusShown = useToggleBusShown();
   const toggleTrolleybusShown = useToggleTrolleybusShown();
   const toggleTramShown = useToggleTramShown();
+
+  const busColor = useThemeColor({}, "busColor");
+  const trolleybusColor = useThemeColor({}, "trolleybusColor");
+  const tramColor = useThemeColor({}, "tramColor");
 
   const {
     data: transportData,
@@ -138,30 +149,36 @@ export default React.memo(function OverviewSectionList({
         data: isBusShown ? busData : [],
         filterValue: isBusShown,
         toggle: toggleBusShown,
+        color: busColor,
       },
       {
         title: "Trolleybus",
         data: isTrolleybusShown ? trolleybusData : [],
         filterValue: isTrolleybusShown,
         toggle: toggleTrolleybusShown,
+        color: trolleybusColor,
       },
       {
         title: "Tram",
         data: isTramShown ? tramData : [],
         filterValue: isTramShown,
         toggle: toggleTramShown,
+        color: tramColor,
       },
     ];
   }, [
-    busData,
-    tramData,
-    trolleybusData,
     isBusShown,
-    isTramShown,
-    isTrolleybusShown,
+    busData,
     toggleBusShown,
-    toggleTramShown,
+    busColor,
+    isTrolleybusShown,
+    trolleybusData,
     toggleTrolleybusShown,
+    trolleybusColor,
+    isTramShown,
+    tramData,
+    toggleTramShown,
+    tramColor,
   ]);
 
   const renderItem = useCallback(
@@ -182,6 +199,7 @@ export default React.memo(function OverviewSectionList({
           filterValue={section.filterValue}
           toggle={section.toggle}
           title={section.title}
+          color={section.color}
         />
       );
     },
@@ -240,5 +258,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 4,
     borderBottomWidth: 1,
+  },
+  colorHorizontalStripe: {
+    flex: 1,
+    height: 10,
+    borderRadius: 6,
+    marginHorizontal: 20,
   },
 });
