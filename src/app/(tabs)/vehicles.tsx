@@ -20,6 +20,7 @@ import { GenericListError } from "@/components/Errors";
 import MapView, { Marker } from "react-native-maps";
 import Button from "@/components/Button";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 const VEHICLE_ITEM_HEIGHT = 100;
 type VehicleListItem = Parameters<ListRenderItem<Vehicle>>[0];
@@ -78,6 +79,9 @@ export default function VehiclesScreen() {
   const tabBarHeight = useBottomTabBarHeight();
 
   const sheetRef = useRef<BottomSheet>(null);
+  const handleBackground = useThemeColor({}, "bottomSheetHandleBackground");
+  const background = useThemeColor({}, "background");
+
   const mapRef = useRef<MapView>(null);
 
   const onCloseSheet = useCallback(() => {
@@ -148,6 +152,8 @@ export default function VehiclesScreen() {
         enablePanDownToClose
         onClose={onCloseSheet}
         index={-1}
+        handleStyle={{ backgroundColor: handleBackground }}
+        backgroundStyle={{ backgroundColor: background }}
       >
         <BottomSheetView style={styles.flex}>
           {!!selectedVehicle && (

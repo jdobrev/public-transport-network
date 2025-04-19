@@ -6,12 +6,14 @@ type SettingsStore = {
   colorScheme: "light" | "dark" | undefined;
   fetchDelay: string;
   errorChance: string;
+  transferRadius: string;
 };
 
 const initialState: SettingsStore = {
   colorScheme: undefined,
   fetchDelay: "250",
   errorChance: "0",
+  transferRadius: "20",
 };
 
 export const settingsSlice = createSlice({
@@ -35,6 +37,12 @@ export const settingsSlice = createSlice({
       action: PayloadAction<SettingsStore["errorChance"]>
     ) => {
       state.errorChance = action.payload;
+    },
+    setTransferRadius: (
+      state,
+      action: PayloadAction<SettingsStore["transferRadius"]>
+    ) => {
+      state.transferRadius = action.payload;
     },
   },
 });

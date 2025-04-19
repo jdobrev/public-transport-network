@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ComponentProps, useCallback } from "react";
 import { Dimensions, RefreshControl, StyleSheet } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
@@ -18,6 +18,17 @@ import MapView, {
   Region,
 } from "react-native-maps";
 import { GenericListError } from "@/components/Errors";
+import ButtonSwitch from "@/components/Button-switch";
+import {
+  FILTER_VIEW_TYPE_VALUES,
+  FilterViewTypeValue,
+} from "@/store/filterSlice";
+import { useSetViewType, useViewType } from "@/store/filterSliceHooks";
+import { Icon } from "@/components/Icon";
+import { ICON_SYMBOLS } from "@/components/ui/IconSymbol";
+import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import StopDetails from "@/components-screens/line-details-components/StopDetails";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 function LineMapView({ route }: { route: Route }) {
   const firstStop = route.stops[0].location;
@@ -29,7 +40,7 @@ function LineMapView({ route }: { route: Route }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.flex}>
       <MapView
         provider={PROVIDER_GOOGLE}
         style={styles.map}
@@ -68,20 +79,65 @@ export default function LineDetails() {
   const { data, isError, isFetching, refetch } = useLineData(lineId);
 
   const { Header, PlaceholderHeader, scrollHandler, headerHeight } =
-    useCollapsibleHeader();
+    useCollapsibleHeader(160);
+
+  const viewType = useViewType();
+  const setViewType = useSetViewType();
+
+  const [selectedStop, setSelectedStop] = React.useState<ComponentProps<
+    typeof StopDetails
+  > | null>(null);
+
+  const [selectedRouteIndex, setSelectedRouteIndex] = React.useState<0 | 1>(0);
+  const toggleRoute = () => {
+    setSelectedRouteIndex((prev) => (prev === 0 ? 1 : 0));
+  };
+
+  const activeRoute = data?.routes?.[selectedRouteIndex];
+  const inactiveRoute = data?.routes?.[1 - selectedRouteIndex];
+
+  const sheetRef = React.useRef<BottomSheet>(null);
+  const handleBackground = useThemeColor({}, "bottomSheetHandleBackground");
+  const backgroundColor = useThemeColor({}, "background");
+
+  const onCloseSheet = useCallback(() => {
+    sheetRef.current?.close();
+    setSelectedStop(null);
+  }, []);
 
   return (
     <SafeAreaView>
-      <Header style={styles.headerInner}>
-        <View style={styles.flex}>
-          <BackButton />
+      <Header>
+        <View style={styles.headerInner}>
+          <View style={styles.flex}>
+            <BackButton />
+          </View>
+          <View style={styles.title}>
+            <Text type="title" style={[{ textAlign: "center" }]}>
+              Line {lineId}
+            </Text>
+          </View>
+          <View style={styles.flex} />
         </View>
-        <View style={styles.title}>
-          <Text type="title" style={[{ textAlign: "center" }]}>
-            Line {lineId}
-          </Text>
-        </View>
-        <View style={styles.flex} />
+        <ButtonSwitch<FilterViewTypeValue>
+          selectedOptionId={viewType}
+          options={[
+            { id: FILTER_VIEW_TYPE_VALUES.LIST, label: "List" },
+            { id: FILTER_VIEW_TYPE_VALUES.MAP, label: "Map" },
+          ]}
+          onValueChange={setViewType}
+        />
+        {!!activeRoute && (
+          <Button
+            onPressIn={toggleRoute}
+            style={styles.routeNameRow}
+            type="ghost"
+          >
+            <Icon name={ICON_SYMBOLS.DIRECTIONS} />
+            <Text type="small">{activeRoute.name}</Text>
+            <Icon name={ICON_SYMBOLS.DIRECTIONS} />
+          </Button>
+        )}
       </Header>
 
       <Animated.ScrollView
@@ -98,32 +154,47 @@ export default function LineDetails() {
       >
         <PlaceholderHeader />
         {isError && <GenericListError />}
-
+        {/* TODO add back 
         {!!data?.routes?.[0] && <LineMapView route={data.routes[0]} />}
+        {!!data?.routes?.[1] && <LineMapView route={data.routes[1]} />} */}
 
-        {data?.routes.map((route) => {
-          return (
-            <View key={route.id} style={{ marginBottom: 16 }}>
-              <Text type="subtitle">{route.name}</Text>
-              {route.stops.map((stop) => {
-                return (
-                  <View key={stop.id} style={{ marginBottom: 8 }}>
-                    <Button
-                      type="ghost"
-                      hitSlop={10}
-                      onPress={() => {
-                        console.log(stop);
-                      }}
-                    >
-                      <Text type="small">{stop.name}</Text>
-                    </Button>
-                  </View>
-                );
-              })}
-            </View>
-          );
-        })}
+        {!!activeRoute && (
+          <View key={activeRoute.id} style={{ marginBottom: 16 }}>
+            {activeRoute.stops.map((stop) => {
+              return (
+                <View key={stop.id} style={{ marginBottom: 8 }}>
+                  <Button
+                    type="ghost"
+                    hitSlop={10}
+                    onPress={() => {
+                      setSelectedStop({
+                        stop,
+                        lineId,
+                        routeId: activeRoute.id,
+                      });
+                      sheetRef.current?.snapToIndex(0);
+                    }}
+                  >
+                    <Text type="small">{stop.name}</Text>
+                  </Button>
+                </View>
+              );
+            })}
+          </View>
+        )}
       </Animated.ScrollView>
+      <BottomSheet
+        ref={sheetRef}
+        snapPoints={["45%"]}
+        enablePanDownToClose
+        onClose={onCloseSheet}
+        index={-1}
+        handleStyle={{ backgroundColor: handleBackground }}
+      >
+        <BottomSheetScrollView style={[styles.flex, { backgroundColor }]}>
+          {!!selectedStop && <StopDetails {...selectedStop} />}
+        </BottomSheetScrollView>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -135,7 +206,13 @@ const styles = StyleSheet.create({
   title: {
     flex: 3,
   },
-  container: { flex: 1 },
+  routeNameRow: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 4,
+  },
   headerInner: {
     flexDirection: "row",
     alignItems: "center",

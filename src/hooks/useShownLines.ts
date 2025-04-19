@@ -1,10 +1,10 @@
-import { useTransportData } from "@/server/queries";
+import { useGroupedTransportData } from "@/server/queries";
 import { useAppSelector } from "@/store/store";
 import { PublicTransportData } from "@/types";
 import { useMemo } from "react";
 
 export const useShownLines = () => {
-  const { data: transportData } = useTransportData();
+  const { data: transportData } = useGroupedTransportData();
 
   const hiddenLines = useAppSelector((state) => state.filter.hiddenLines);
   const shownTransports = useAppSelector(

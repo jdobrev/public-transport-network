@@ -1,12 +1,13 @@
+import { PressableIcon } from "@/components/Icon";
 import { Text } from "@/components/Text";
-import { ICON_SYMBOLS, IconSymbol } from "@/components/ui/IconSymbol";
+import { ICON_SYMBOLS } from "@/components/ui/IconSymbol";
 import { View } from "@/components/View";
 import useRoutesRegion from "@/hooks/useRoutesRegion";
 import { useShownLines } from "@/hooks/useShownLines";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import React, { useCallback, useMemo } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
-import MapView, { Polyline, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import { StyleSheet } from "react-native";
+import MapView, { Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 
 //TODO add tabble labels to each line for easier selection
 const OverviewMapView = React.memo(
@@ -22,8 +23,6 @@ const OverviewMapView = React.memo(
     const busColor = useThemeColor({}, "busColor");
     const trolleybusColor = useThemeColor({}, "trolleybusColor");
     const tramColor = useThemeColor({}, "tramColor");
-    const iconColor = useThemeColor({}, "icon");
-    const iconBackgroundColor = useThemeColor({}, "iconBackground");
 
     const getColor = useCallback(
       (t: string) =>
@@ -93,12 +92,11 @@ const OverviewMapView = React.memo(
         >
           {renderLines}
         </MapView>
-        <TouchableOpacity
-          style={[styles.filterIcon, { backgroundColor: iconBackgroundColor }]}
+        <PressableIcon
+          name={ICON_SYMBOLS.FILTER}
           onPress={onPressFilter}
-        >
-          <IconSymbol name={ICON_SYMBOLS.FILTER} size={24} color={iconColor} />
-        </TouchableOpacity>
+          containerStyle={styles.filterIcon}
+        />
       </View>
     );
   }

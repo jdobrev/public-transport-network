@@ -6,7 +6,7 @@ import { StyleSheet, RefreshControl } from "react-native";
 import { useHiddenLineById, useToggleLineById } from "@/store/filterSliceHooks";
 import Button from "@/components/Button";
 import AnimatedSectionList from "@/components/AnimatedSectionList";
-import { useTransportData } from "@/server/queries";
+import { useGroupedTransportData } from "@/server/queries";
 import { GenericListError } from "@/components/Errors";
 import {
   useIsBusShown,
@@ -114,7 +114,7 @@ export default React.memo(function OverviewSectionList({
     isFetching,
     isError,
     refetch,
-  } = useTransportData();
+  } = useGroupedTransportData();
 
   const busData = useMemo(
     () =>

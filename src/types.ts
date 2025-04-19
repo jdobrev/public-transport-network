@@ -4,6 +4,7 @@ import publicTransportData from "@/server/mock-api/public-transport-data.json";
 export type Vehicle = (typeof vehicles)[number];
 export type PublicTransportData = (typeof publicTransportData)[number];
 export type Route = PublicTransportData["routes"][number];
+export type Stop = Route["stops"][number];
 
 export const TRANSPORT_TYPES = {
   A: "A", //"Bus"

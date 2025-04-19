@@ -17,6 +17,7 @@ const MAPPING = {
   "chevron.left": "chevron-left",
   "camera.filters": "filter-list",
   gear: "settings",
+  "arrow.down.backward": "compare-arrows",
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],
@@ -32,6 +33,7 @@ export const ICON_SYMBOLS = {
   CHEVRON_RIGHT: "chevron.right",
   FILTER: "camera.filters",
   SETTINGS: "gear",
+  DIRECTIONS: "arrow.down.backward",
 } satisfies Record<string, IconSymbolName>;
 
 /**

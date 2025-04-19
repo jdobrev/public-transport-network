@@ -41,11 +41,15 @@ const groupByTransportType = (data: PublicTransportData[]) => {
 };
 
 export const useTransportData = () => {
-  const query = useQuery({
+  return useQuery({
     queryKey: ["transportData"],
     queryFn: getPublicTransportData,
     retry: false, // This is to enable mock api errors
   });
+};
+
+export const useGroupedTransportData = () => {
+  const query = useTransportData();
 
   const grouped = useMemo(
     () => (query.data ? groupByTransportType(query.data) : undefined),

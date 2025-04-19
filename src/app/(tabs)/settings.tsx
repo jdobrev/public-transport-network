@@ -10,6 +10,8 @@ import {
   useSetColorScheme,
   useSetErrorChance,
   useSetFetchDelay,
+  useSetTransferRadius,
+  useTransferRadius,
 } from "@/store/settingsSliceHooks";
 import { useMemo } from "react";
 import { StyleSheet } from "react-native";
@@ -24,6 +26,9 @@ export default function Settings() {
 
   const errorChance = useErrorChance();
   const setErrorChance = useSetErrorChance();
+
+  const transferRadius = useTransferRadius();
+  const setTransferRadius = useSetTransferRadius();
 
   const { Header, scrollHandler, PlaceholderHeader } = useCollapsibleHeader();
 
@@ -88,6 +93,27 @@ export default function Settings() {
           setErrorChance(newVal);
         },
       },
+      {
+        name: "Transfer radius (m)",
+        options: [
+          {
+            id: "20",
+            label: "20",
+          },
+          {
+            id: "70",
+            label: "70",
+          },
+          {
+            id: "200",
+            label: "200",
+          },
+        ],
+        selectedOptionId: transferRadius,
+        onValueChange: (newVal: string) => {
+          setTransferRadius(newVal);
+        },
+      },
     ],
     [
       colorScheme,
@@ -96,6 +122,8 @@ export default function Settings() {
       setColorScheme,
       setErrorChance,
       setFetchDelay,
+      setTransferRadius,
+      transferRadius,
     ]
   );
 

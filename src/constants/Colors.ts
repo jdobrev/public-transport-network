@@ -10,6 +10,9 @@ const busColor = "#007AFF";
 const trolleybusColor = "#32A900";
 const tramColor = "#FF375F";
 
+const primaryLight = tintColorLight;
+const primaryDark = "#1D3D47";
+
 export const Colors = {
   light: {
     text: "#11181C",
@@ -20,10 +23,11 @@ export const Colors = {
     iconBackground: "#007AFF",
     tabIconDefault: "#687076",
     tabIconSelected: tintColorLight,
-    primary: tintColorLight,
+    primary: primaryLight,
     busColor,
     trolleybusColor,
     tramColor,
+    bottomSheetHandleBackground: "#007AFF",
   },
   dark: {
     text: "#ECEDEE",
@@ -34,9 +38,10 @@ export const Colors = {
     iconBackground: "#007AFF",
     tabIconDefault: "#9BA1A6",
     tabIconSelected: tintColorDark,
-    primary: "#1D3D47",
+    primary: primaryDark,
     busColor,
     trolleybusColor,
     tramColor,
+    bottomSheetHandleBackground: "#007AFF",
   },
 };

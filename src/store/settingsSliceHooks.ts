@@ -37,3 +37,14 @@ export const useSetErrorChance = () => {
   };
   return setErrorChance;
 };
+
+export const useTransferRadius = () =>
+  useAppSelector((state) => state.settings.transferRadius);
+
+export const useSetTransferRadius = () => {
+  const dispatch = useAppDispatch();
+  const setTransferRadius = (transferRadius: string) => {
+    dispatch(settingsSlice.actions.setTransferRadius(transferRadius));
+  };
+  return setTransferRadius;
+};
