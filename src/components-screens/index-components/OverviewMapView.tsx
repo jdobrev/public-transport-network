@@ -1,6 +1,7 @@
 import { Text } from "@/components/Text";
 import { ICON_SYMBOLS, IconSymbol } from "@/components/ui/IconSymbol";
 import { View } from "@/components/View";
+import useRoutesRegion from "@/hooks/useRoutesRegion";
 import { useShownLines } from "@/hooks/useShownLines";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import React, { useCallback, useMemo } from "react";
@@ -49,23 +50,7 @@ const OverviewMapView = React.memo(
       );
     }, [linesOnMap]);
 
-    const initialRegion: Region = useMemo(() => {
-      const first = linesOnMap[0]?.routes[0].stops[0].location;
-      if (first) {
-        return {
-          latitude: first.lat,
-          longitude: first.lon,
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1,
-        };
-      }
-      return {
-        latitude: 0,
-        longitude: 0,
-        latitudeDelta: 100,
-        longitudeDelta: 100,
-      };
-    }, [linesOnMap]);
+    const region = useRoutesRegion(routesToRender);
 
     const renderLines = useMemo(
       () =>
@@ -93,10 +78,17 @@ const OverviewMapView = React.memo(
     return (
       <View style={styles.flex}>
         <MapView
+          showsUserLocation
           provider={PROVIDER_GOOGLE}
           style={styles.flex}
-          initialRegion={initialRegion}
-          showsUserLocation
+          region={
+            region ?? {
+              latitude: 0,
+              longitude: 0,
+              latitudeDelta: 0.1,
+              longitudeDelta: 0.1,
+            }
+          }
         >
           {renderLines}
         </MapView>
