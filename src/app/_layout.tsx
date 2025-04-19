@@ -17,6 +17,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider as ReduxStoreProvider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "@/store/store";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,23 +61,28 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ReduxStoreProvider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <ThemeProvider>
-            <SafeAreaProvider>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                }}
-              >
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="+not-found" />
-              </Stack>
-            </SafeAreaProvider>
-          </ThemeProvider>
-        </PersistGate>
-      </ReduxStoreProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView>
+      <QueryClientProvider client={queryClient}>
+        <ReduxStoreProvider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <ThemeProvider>
+              <SafeAreaProvider>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                  }}
+                >
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen name="+not-found" />
+                </Stack>
+              </SafeAreaProvider>
+            </ThemeProvider>
+          </PersistGate>
+        </ReduxStoreProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

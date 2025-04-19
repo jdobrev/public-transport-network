@@ -21,7 +21,11 @@
           "apiKey": "AIzaSyBn3Q0rstp6osQs8gQn4PSKuSwWo2GDpwM"
         }
       },
-      "permissions": ["ACCESS_FINE_LOCATION"]
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "package": "com.anonymous.publictransportnetwork"
     },
     "web": {
       "bundler": "metro",

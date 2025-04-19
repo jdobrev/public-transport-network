@@ -8,35 +8,49 @@ import {
 import { Text } from "@/components/Text";
 import { View } from "@/components/View";
 import { useVehicles } from "@/server/queries";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import React from "react";
 import { Vehicle } from "@/types";
 import ActivityIndicator from "@/components/ActivityIndicator";
 import { SafeAreaView } from "@/components/SafeAreaView";
 import Animated from "react-native-reanimated";
-
-const VEHICLE_ITEM_HEIGHT = 100;
-
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { GenericListError } from "@/components/Errors";
+import MapView, { Marker } from "react-native-maps";
+import Button from "@/components/Button";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 
-type RenderItemArgs = Parameters<ListRenderItem<Vehicle>>[0];
+const VEHICLE_ITEM_HEIGHT = 100;
+type VehicleListItem = Parameters<ListRenderItem<Vehicle>>[0];
 
-const VehicleItem = React.memo(({ item, index }: RenderItemArgs) => {
-  return (
-    <View style={styles.vehicleContainer}>
-      <Text>{index + 1}</Text>
-      <View style={styles.vehicle}>
-        <Text>{item.vehID}</Text>
-      </View>
-    </View>
-  );
-});
+const VehicleItem = React.memo(
+  ({
+    item,
+    index,
+    onPress,
+  }: VehicleListItem & {
+    onPress: (item: Vehicle) => void;
+  }) => {
+    return (
+      <Button onPress={() => onPress(item)}>
+        <View style={styles.vehicleContainer}>
+          <Text>{index + 1}</Text>
+          <View style={styles.vehicle}>
+            <Text>{item.vehID}</Text>
+          </View>
+        </View>
+      </Button>
+    );
+  }
+);
 
 export default function VehiclesScreen() {
+  const [listHeight, setListHeight] = useState(0);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+
   const {
-    data,
+    data: vehiclesData,
     isError,
     isFetching,
     refetch,
@@ -49,11 +63,9 @@ export default function VehiclesScreen() {
     useCollapsibleHeader();
 
   const vehicles = useMemo(
-    () => data?.pages.flatMap((page) => page.data) ?? [],
-    [data]
+    () => vehiclesData?.pages.flatMap((page) => page.data) ?? [],
+    [vehiclesData]
   );
-
-  const [listHeight, setListHeight] = useState(0);
 
   const onListLayout = useCallback((e: LayoutChangeEvent) => {
     const { height } = e.nativeEvent.layout;
@@ -65,9 +77,25 @@ export default function VehiclesScreen() {
 
   const tabBarHeight = useBottomTabBarHeight();
 
-  const renderVehicle = useCallback((args: RenderItemArgs) => {
-    return <VehicleItem {...args} />;
+  const sheetRef = useRef<BottomSheet>(null);
+  const mapRef = useRef<MapView>(null);
+
+  const onCloseSheet = useCallback(() => {
+    sheetRef.current?.close();
+    setSelectedVehicle(null);
   }, []);
+
+  const onPressVehicle = useCallback((item: Vehicle) => {
+    setSelectedVehicle(item);
+    sheetRef.current?.snapToIndex(1);
+  }, []);
+
+  const renderVehicle = useCallback(
+    (args: VehicleListItem) => {
+      return <VehicleItem {...args} onPress={onPressVehicle} />;
+    },
+    [onPressVehicle]
+  );
 
   return (
     <SafeAreaView>
@@ -113,11 +141,47 @@ export default function VehiclesScreen() {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
       />
+
+      <BottomSheet
+        ref={sheetRef}
+        snapPoints={["65%"]}
+        enablePanDownToClose
+        onClose={onCloseSheet}
+        index={-1}
+      >
+        <BottomSheetView style={styles.flex}>
+          {!!selectedVehicle && (
+            <MapView
+              ref={mapRef}
+              style={styles.flex}
+              region={{
+                latitude: selectedVehicle.lat,
+                longitude: selectedVehicle.lon,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+              showsUserLocation
+              scrollEnabled={false}
+              zoomEnabled={false}
+              rotateEnabled={false}
+              pitchEnabled={false}
+            >
+              <Marker
+                coordinate={{
+                  latitude: selectedVehicle.lat,
+                  longitude: selectedVehicle.lon,
+                }}
+              />
+            </MapView>
+          )}
+        </BottomSheetView>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   vehicleContainer: {
     height: VEHICLE_ITEM_HEIGHT,
     flexDirection: "row",
