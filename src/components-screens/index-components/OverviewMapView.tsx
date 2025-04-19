@@ -9,7 +9,7 @@ import React, { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import MapView, { Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 
-//TODO add tabble labels to each line for easier selection
+//TODO add tappable labels to each line for easier selection
 const OverviewMapView = React.memo(
   ({
     onPressFilter,

@@ -83,12 +83,11 @@ const RenderSectionHeader = React.memo(
   }
 );
 
+type HeaderHook = ReturnType<typeof useCollapsibleHeader>;
 type OverviewSectionListProps = {
-  scrollHandler: ReturnType<typeof useCollapsibleHeader>["scrollHandler"];
-  PlaceholderHeader: ReturnType<
-    typeof useCollapsibleHeader
-  >["PlaceholderHeader"];
-  headerHeight: ReturnType<typeof useCollapsibleHeader>["headerHeight"];
+  scrollHandler: HeaderHook["scrollHandler"];
+  PlaceholderHeader: HeaderHook["PlaceholderHeader"];
+  headerHeight: HeaderHook["headerHeight"];
   onPressLine: (lineId: string) => void;
 };
 

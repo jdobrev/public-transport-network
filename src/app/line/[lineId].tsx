@@ -1,5 +1,5 @@
 import React, { ComponentProps, useCallback, useMemo } from "react";
-import { Dimensions, RefreshControl, StyleSheet } from "react-native";
+import { RefreshControl, StyleSheet } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { View } from "@/components/View";
@@ -9,14 +9,6 @@ import Button from "@/components/Button";
 import BackButton from "@/components/BackButton";
 import { SafeAreaView } from "@/components/SafeAreaView";
 import { useLineData } from "@/server/queries";
-import { Route, Stop } from "@/types";
-
-import MapView, {
-  Marker,
-  Polyline,
-  PROVIDER_GOOGLE,
-  Region,
-} from "react-native-maps";
 import { GenericListError } from "@/components/Errors";
 import ButtonSwitch from "@/components/Button-switch";
 import {
@@ -29,111 +21,29 @@ import { ICON_SYMBOLS } from "@/components/ui/IconSymbol";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import StopDetails from "@/components-screens/line-details-components/StopDetails";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import useRoutesRegion from "@/hooks/useRoutesRegion";
+import InteractiveMap from "@/components-screens/line-details-components/InteractiveMap";
+import { Stop } from "@/types";
 
-const STROKE_WIDTH = 12;
-
-type ViewRoutesProps = {
-  activeRoute: Route;
-  inactiveRoute: Route;
-  onPressStop: (stop: Stop, isActive: boolean) => void;
-  onToggleLine: () => void;
-  selectedStopId?: string;
-};
-
-const ViewRoutes = React.memo(
+const RenderStop = React.memo(
   ({
-    activeRoute,
-    inactiveRoute,
+    stop,
+    isActive,
     onPressStop,
-    onToggleLine,
-    selectedStopId,
-  }: ViewRoutesProps) => {
-    const activeCoords = useMemo(
-      () =>
-        activeRoute.segments.flatMap((seg) =>
-          seg.coordinates.map((c) => ({
-            latitude: c.lat,
-            longitude: c.lon,
-          }))
-        ),
-      [activeRoute]
-    );
-
-    const inactiveCoords = useMemo(
-      () =>
-        inactiveRoute.segments.flatMap((seg) =>
-          seg.coordinates.map((c) => ({
-            latitude: c.lat,
-            longitude: c.lon,
-          }))
-        ),
-      [inactiveRoute]
-    );
-
-    const region = useRoutesRegion([
-      { coords: [...activeCoords] },
-      { coords: [...inactiveCoords] },
-    ]);
-
+  }: {
+    stop: Stop;
+    isActive: boolean;
+    onPressStop: (stop: Stop, isActive: boolean) => void;
+  }) => {
     return (
-      <View style={styles.flex}>
-        <MapView //TODO add colored arrow icons instead for markers
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          region={
-            region ?? {
-              latitude: 0,
-              longitude: 0,
-              latitudeDelta: 0.1,
-              longitudeDelta: 0.1,
-            }
-          }
-          showsUserLocation
-        >
-          <Polyline
-            coordinates={inactiveCoords}
-            strokeColor="gray"
-            strokeWidth={STROKE_WIDTH}
-            tappable
-            onPress={onToggleLine}
-          />
-          {inactiveRoute.stops.map((stop) => (
-            <Marker
-              key={stop.id}
-              coordinate={{
-                latitude: stop.location.lat,
-                longitude: stop.location.lon,
-              }}
-              onPress={() => {
-                onPressStop(stop, false);
-              }}
-              titleVisibility="visible"
-              pinColor="orange"
-            />
-          ))}
-
-          <Polyline
-            coordinates={activeCoords}
-            strokeColor="#007AFF"
-            strokeWidth={STROKE_WIDTH}
-            zIndex={1}
-          />
-          {activeRoute.stops.map((stop) => (
-            <Marker
-              key={stop.id}
-              coordinate={{
-                latitude: stop.location.lat,
-                longitude: stop.location.lon,
-              }}
-              onPress={() => onPressStop(stop, true)}
-              // title={stop.name}
-              // titleVisibility="adaptive"
-              pinColor={selectedStopId === stop.id ? "red" : "blue"}
-            />
-          ))}
-        </MapView>
-      </View>
+      <Button
+        type="ghost"
+        hitSlop={10}
+        onPress={() => {
+          onPressStop(stop, isActive);
+        }}
+      >
+        <Text type="small">{stop.name}</Text>
+      </Button>
     );
   }
 );
@@ -147,6 +57,7 @@ export default function LineDetails() {
 
   const viewType = useViewType();
   const setViewType = useSetViewType();
+  const isList = viewType === FILTER_VIEW_TYPE_VALUES.LIST;
 
   const [selectedStop, setSelectedStop] = React.useState<ComponentProps<
     typeof StopDetails
@@ -169,7 +80,53 @@ export default function LineDetails() {
     setSelectedStop(null);
   }, []);
 
-  const isList = viewType === FILTER_VIEW_TYPE_VALUES.LIST;
+  const onPressStop = useCallback(
+    (stop: Stop, isActive: boolean) => {
+      if (!activeRoute || !inactiveRoute) return;
+
+      setSelectedStop({
+        stop,
+        lineId,
+        routeId: isActive ? activeRoute.id : inactiveRoute.id,
+      });
+      if (!isActive) {
+        toggleRoute();
+      }
+      sheetRef.current?.snapToIndex(0);
+    },
+    [activeRoute, inactiveRoute, lineId]
+  );
+
+  const renderMapView = useMemo(() => {
+    if (isList || !activeRoute || !inactiveRoute) {
+      return null;
+    }
+    return (
+      <InteractiveMap
+        activeRoute={activeRoute}
+        inactiveRoute={inactiveRoute}
+        onPressStop={onPressStop}
+        onToggleLine={() => {
+          toggleRoute();
+          sheetRef.current?.close();
+        }}
+        selectedStopId={selectedStop?.stop.id}
+      />
+    );
+  }, [isList, activeRoute, inactiveRoute, onPressStop, selectedStop?.stop.id]);
+
+  const scrollEnabled = isError || isFetching || isList; // Disable scroll in map view
+
+  const renderStopItem = useCallback(
+    ({ item: stop }: { item: Stop }) => {
+      if (!activeRoute) return null;
+
+      return (
+        <RenderStop stop={stop} isActive={true} onPressStop={onPressStop} />
+      );
+    },
+    [activeRoute, onPressStop]
+  );
 
   return (
     <SafeAreaView>
@@ -206,70 +163,36 @@ export default function LineDetails() {
         )}
       </Header>
 
-      <Animated.ScrollView
+      {/**
+       * In List view the FlatList is used to display the list of stops for the selected line.
+       * In InteractiveMap view the FlatList is only used for convenient <RefreshControl>.
+       */}
+      <Animated.FlatList
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         refreshControl={
-          <RefreshControl
-            refreshing={isFetching}
-            onRefresh={refetch}
-            progressViewOffset={headerHeight}
-          />
+          scrollEnabled ? (
+            <RefreshControl
+              refreshing={isFetching}
+              onRefresh={refetch}
+              progressViewOffset={headerHeight}
+            />
+          ) : undefined
         }
-        scrollEnabled={isError || isList} // Disable scroll in map view
-      >
-        <PlaceholderHeader />
-        {isError && <GenericListError />}
-
-        {isList
-          ? !!activeRoute && (
-              <View style={{ marginBottom: 16 }}>
-                {activeRoute.stops.map((stop) => {
-                  return (
-                    <View key={stop.id} style={{ marginBottom: 8 }}>
-                      <Button
-                        type="ghost"
-                        hitSlop={10}
-                        onPress={() => {
-                          setSelectedStop({
-                            stop,
-                            lineId,
-                            routeId: activeRoute.id,
-                          });
-                          sheetRef.current?.snapToIndex(0);
-                        }}
-                      >
-                        <Text type="small">{stop.name}</Text>
-                      </Button>
-                    </View>
-                  );
-                })}
-              </View>
-            )
-          : !!activeRoute &&
-            !!inactiveRoute && (
-              <ViewRoutes
-                activeRoute={activeRoute}
-                inactiveRoute={inactiveRoute}
-                onPressStop={(stop, isActive) => {
-                  setSelectedStop({
-                    stop,
-                    lineId,
-                    routeId: isActive ? activeRoute.id : inactiveRoute.id,
-                  });
-                  if (!isActive) {
-                    toggleRoute();
-                  }
-                  sheetRef.current?.snapToIndex(0);
-                }}
-                onToggleLine={() => {
-                  toggleRoute();
-                  sheetRef.current?.close();
-                }}
-                selectedStopId={selectedStop?.stop.id}
-              />
-            )}
-      </Animated.ScrollView>
+        scrollEnabled={scrollEnabled}
+        showsVerticalScrollIndicator={scrollEnabled}
+        data={isList ? activeRoute?.stops : []}
+        keyExtractor={(stop) => stop.id}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        renderItem={renderStopItem}
+        ListHeaderComponent={
+          <>
+            <PlaceholderHeader />
+            {isError && <GenericListError />}
+          </>
+        }
+        ListFooterComponent={renderMapView}
+      />
 
       <BottomSheet
         ref={sheetRef}
@@ -291,13 +214,11 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   title: {
     flex: 3,
+  },
+  separator: {
+    height: 8,
   },
   routeNameRow: {
     width: "100%",
@@ -311,9 +232,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 12,
-  },
-  map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
   },
 });
