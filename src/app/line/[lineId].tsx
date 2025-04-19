@@ -128,6 +128,8 @@ export default function LineDetails() {
     [activeRoute, onPressStop]
   );
 
+  //TODO Fix StopDetails hiding selected stop when selecting a new stop
+
   return (
     <SafeAreaView>
       <Header>
