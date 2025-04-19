@@ -31,8 +31,10 @@ const OverviewMapView = React.memo(
     );
 
     const routesToRender = useMemo(() => {
-      return linesOnMap.flatMap((line) =>
-        line.routes.map((route) => {
+      const renderOnlyOneRoute = true; //change this to false to render both routes
+      return linesOnMap.flatMap((line) => {
+        const routes = renderOnlyOneRoute ? [line.routes[0]] : line.routes;
+        return routes.map((route) => {
           // merge all segments' coordinates into one array so we can draw a single polyline
           const coords = route.segments.flatMap((seg) =>
             seg.coordinates.map((c) => ({
@@ -46,8 +48,8 @@ const OverviewMapView = React.memo(
             transportType: route.transportType,
             coords,
           };
-        })
-      );
+        });
+      });
     }, [linesOnMap]);
 
     const region = useRoutesRegion(routesToRender);

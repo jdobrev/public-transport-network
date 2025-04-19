@@ -11,7 +11,7 @@ export function GenericListError({
   return (
     <View {...props} style={[styles.error, style]}>
       <Text>Something went wrong</Text>
-      <Text type="faded">Pull down to try again</Text>
+      <Text type="faded">Refresh to try again</Text>
     </View>
   );
 }

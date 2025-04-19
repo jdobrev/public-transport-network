@@ -1,4 +1,4 @@
-import React, { ComponentProps, useCallback } from "react";
+import React, { ComponentProps, useCallback, useMemo } from "react";
 import { Dimensions, RefreshControl, StyleSheet } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
@@ -9,7 +9,7 @@ import Button from "@/components/Button";
 import BackButton from "@/components/BackButton";
 import { SafeAreaView } from "@/components/SafeAreaView";
 import { useLineData } from "@/server/queries";
-import { Route } from "@/types";
+import { Route, Stop } from "@/types";
 
 import MapView, {
   Marker,
@@ -29,50 +29,114 @@ import { ICON_SYMBOLS } from "@/components/ui/IconSymbol";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import StopDetails from "@/components-screens/line-details-components/StopDetails";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import useRoutesRegion from "@/hooks/useRoutesRegion";
 
-function LineMapView({ route }: { route: Route }) {
-  const firstStop = route.stops[0].location;
-  const initialRegion: Region = {
-    latitude: firstStop.lat,
-    longitude: firstStop.lon,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  };
+const STROKE_WIDTH = 12;
 
-  return (
-    <View style={styles.flex}>
-      <MapView
-        provider={PROVIDER_GOOGLE}
-        style={styles.map}
-        initialRegion={initialRegion}
-        showsUserLocation={true}
-      >
-        {route.stops.map((stop) => (
-          <Marker
-            key={stop.id}
-            coordinate={{
-              latitude: stop.location.lat,
-              longitude: stop.location.lon,
-            }}
-            title={stop.name}
-          />
-        ))}
+type ViewRoutesProps = {
+  activeRoute: Route;
+  inactiveRoute: Route;
+  onPressStop: (stop: Stop, isActive: boolean) => void;
+  onToggleLine: () => void;
+  selectedStopId?: string;
+};
 
-        {route.segments.map((seg) => (
+const ViewRoutes = React.memo(
+  ({
+    activeRoute,
+    inactiveRoute,
+    onPressStop,
+    onToggleLine,
+    selectedStopId,
+  }: ViewRoutesProps) => {
+    const activeCoords = useMemo(
+      () =>
+        activeRoute.segments.flatMap((seg) =>
+          seg.coordinates.map((c) => ({
+            latitude: c.lat,
+            longitude: c.lon,
+          }))
+        ),
+      [activeRoute]
+    );
+
+    const inactiveCoords = useMemo(
+      () =>
+        inactiveRoute.segments.flatMap((seg) =>
+          seg.coordinates.map((c) => ({
+            latitude: c.lat,
+            longitude: c.lon,
+          }))
+        ),
+      [inactiveRoute]
+    );
+
+    const region = useRoutesRegion([
+      { coords: [...activeCoords] },
+      { coords: [...inactiveCoords] },
+    ]);
+
+    return (
+      <View style={styles.flex}>
+        <MapView //TODO add colored arrow icons instead for markers
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          region={
+            region ?? {
+              latitude: 0,
+              longitude: 0,
+              latitudeDelta: 0.1,
+              longitudeDelta: 0.1,
+            }
+          }
+          showsUserLocation
+        >
           <Polyline
-            key={seg.id}
-            coordinates={seg.coordinates.map((c) => ({
-              latitude: c.lat,
-              longitude: c.lon,
-            }))}
-            strokeColor="#007AFF"
-            strokeWidth={3}
+            coordinates={inactiveCoords}
+            strokeColor="gray"
+            strokeWidth={STROKE_WIDTH}
+            tappable
+            onPress={onToggleLine}
           />
-        ))}
-      </MapView>
-    </View>
-  );
-}
+          {inactiveRoute.stops.map((stop) => (
+            <Marker
+              key={stop.id}
+              coordinate={{
+                latitude: stop.location.lat,
+                longitude: stop.location.lon,
+              }}
+              onPress={() => {
+                onPressStop(stop, false);
+              }}
+              titleVisibility="visible"
+              pinColor="orange"
+            />
+          ))}
+
+          <Polyline
+            coordinates={activeCoords}
+            strokeColor="#007AFF"
+            strokeWidth={STROKE_WIDTH}
+            zIndex={1}
+          />
+          {activeRoute.stops.map((stop) => (
+            <Marker
+              key={stop.id}
+              coordinate={{
+                latitude: stop.location.lat,
+                longitude: stop.location.lon,
+              }}
+              onPress={() => onPressStop(stop, true)}
+              // title={stop.name}
+              // titleVisibility="adaptive"
+              pinColor={selectedStopId === stop.id ? "red" : "blue"}
+            />
+          ))}
+        </MapView>
+      </View>
+    );
+  }
+);
 
 export default function LineDetails() {
   const { lineId } = useLocalSearchParams<{ lineId: string }>();
@@ -104,6 +168,8 @@ export default function LineDetails() {
     sheetRef.current?.close();
     setSelectedStop(null);
   }, []);
+
+  const isList = viewType === FILTER_VIEW_TYPE_VALUES.LIST;
 
   return (
     <SafeAreaView>
@@ -143,7 +209,6 @@ export default function LineDetails() {
       <Animated.ScrollView
         onScroll={scrollHandler}
         scrollEventThrottle={16}
-        contentContainerStyle={{ paddingTop: 0 }}
         refreshControl={
           <RefreshControl
             refreshing={isFetching}
@@ -151,38 +216,61 @@ export default function LineDetails() {
             progressViewOffset={headerHeight}
           />
         }
+        scrollEnabled={isError || isList} // Disable scroll in map view
       >
         <PlaceholderHeader />
         {isError && <GenericListError />}
-        {/* TODO add back 
-        {!!data?.routes?.[0] && <LineMapView route={data.routes[0]} />}
-        {!!data?.routes?.[1] && <LineMapView route={data.routes[1]} />} */}
 
-        {!!activeRoute && (
-          <View key={activeRoute.id} style={{ marginBottom: 16 }}>
-            {activeRoute.stops.map((stop) => {
-              return (
-                <View key={stop.id} style={{ marginBottom: 8 }}>
-                  <Button
-                    type="ghost"
-                    hitSlop={10}
-                    onPress={() => {
-                      setSelectedStop({
-                        stop,
-                        lineId,
-                        routeId: activeRoute.id,
-                      });
-                      sheetRef.current?.snapToIndex(0);
-                    }}
-                  >
-                    <Text type="small">{stop.name}</Text>
-                  </Button>
-                </View>
-              );
-            })}
-          </View>
-        )}
+        {isList
+          ? !!activeRoute && (
+              <View style={{ marginBottom: 16 }}>
+                {activeRoute.stops.map((stop) => {
+                  return (
+                    <View key={stop.id} style={{ marginBottom: 8 }}>
+                      <Button
+                        type="ghost"
+                        hitSlop={10}
+                        onPress={() => {
+                          setSelectedStop({
+                            stop,
+                            lineId,
+                            routeId: activeRoute.id,
+                          });
+                          sheetRef.current?.snapToIndex(0);
+                        }}
+                      >
+                        <Text type="small">{stop.name}</Text>
+                      </Button>
+                    </View>
+                  );
+                })}
+              </View>
+            )
+          : !!activeRoute &&
+            !!inactiveRoute && (
+              <ViewRoutes
+                activeRoute={activeRoute}
+                inactiveRoute={inactiveRoute}
+                onPressStop={(stop, isActive) => {
+                  setSelectedStop({
+                    stop,
+                    lineId,
+                    routeId: isActive ? activeRoute.id : inactiveRoute.id,
+                  });
+                  if (!isActive) {
+                    toggleRoute();
+                  }
+                  sheetRef.current?.snapToIndex(0);
+                }}
+                onToggleLine={() => {
+                  toggleRoute();
+                  sheetRef.current?.close();
+                }}
+                selectedStopId={selectedStop?.stop.id}
+              />
+            )}
       </Animated.ScrollView>
+
       <BottomSheet
         ref={sheetRef}
         snapPoints={["45%"]}
@@ -202,6 +290,11 @@ export default function LineDetails() {
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     flex: 3,
