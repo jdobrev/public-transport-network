@@ -17,6 +17,22 @@ export const useVehicles = () => {
   });
 };
 
+export const useTransportData = () => {
+  return useQuery({
+    queryKey: ["transportData"],
+    queryFn: getPublicTransportData,
+    retry: false, // This is to enable mock api errors
+  });
+};
+
+export const useLineData = (lineId: string) => {
+  return useQuery({
+    queryKey: ["lineData", lineId],
+    queryFn: () => getLineData(lineId),
+    retry: false, // This is to enable mock api errors
+  });
+};
+
 function isTransportType(value: unknown): value is TransportType {
   return Object.values(TRANSPORT_TYPES).some((val) => val === value);
 }
@@ -40,14 +56,6 @@ const groupByTransportType = (data: PublicTransportData[]) => {
   return groupedData;
 };
 
-export const useTransportData = () => {
-  return useQuery({
-    queryKey: ["transportData"],
-    queryFn: getPublicTransportData,
-    retry: false, // This is to enable mock api errors
-  });
-};
-
 export const useGroupedTransportData = () => {
   const query = useTransportData();
 
@@ -60,12 +68,4 @@ export const useGroupedTransportData = () => {
     ...query,
     data: grouped,
   };
-};
-
-export const useLineData = (lineId: string) => {
-  return useQuery({
-    queryKey: ["lineData", lineId],
-    queryFn: () => getLineData(lineId),
-    retry: false, // This is to enable mock api errors
-  });
 };
