@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, RefreshControl, StyleSheet } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { View } from "@/components/View";
@@ -17,6 +17,7 @@ import MapView, {
   PROVIDER_GOOGLE,
   Region,
 } from "react-native-maps";
+import { GenericListError } from "@/components/Errors";
 
 function LineMapView({ route }: { route: Route }) {
   const firstStop = route.stops[0].location;
@@ -64,12 +65,10 @@ function LineMapView({ route }: { route: Route }) {
 
 export default function LineDetails() {
   const { lineId } = useLocalSearchParams<{ lineId: string }>();
-  const { data } = useLineData(lineId);
+  const { data, isError, isFetching, refetch } = useLineData(lineId);
 
   const { Header, PlaceholderHeader, scrollHandler, headerHeight } =
     useCollapsibleHeader();
-
-  //TODO Handle Loading/Error
 
   return (
     <SafeAreaView>
@@ -89,8 +88,16 @@ export default function LineDetails() {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingTop: 0 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isFetching}
+            onRefresh={refetch}
+            progressViewOffset={headerHeight}
+          />
+        }
       >
         <PlaceholderHeader />
+        {isError && <GenericListError />}
 
         {!!data?.routes?.[0] && <LineMapView route={data.routes[0]} />}
 
