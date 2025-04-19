@@ -24,9 +24,9 @@ const Button = ({ type = "outline", style, ...props }: ButtonProps) => {
       children={children}
       style={[
         styles.base,
-        { borderColor: primaryColor },
-        type === "outline" ? styles.outline : undefined,
-        type === "ghost" ? styles.ghost : undefined,
+        type === "outline"
+          ? { borderColor: primaryColor, borderWidth: 1 }
+          : undefined,
         type === "icon" ? styles.icon : undefined,
         style,
       ]}
@@ -40,6 +40,8 @@ const styles = StyleSheet.create({
     margin: 8,
     padding: 8,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "transparent",
   },
   icon: {
     padding: 0,
@@ -47,11 +49,5 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: "center",
-  },
-  outline: {
-    borderWidth: 1,
-  },
-  ghost: {
-    borderWidth: 0,
   },
 });
