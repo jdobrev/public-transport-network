@@ -2,7 +2,7 @@
   "expo": {
     "name": "public-transport-network",
     "slug": "public-transport-network",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -21,10 +21,7 @@
           "apiKey": "AIzaSyBn3Q0rstp6osQs8gQn4PSKuSwWo2GDpwM"
         }
       },
-      "permissions": [
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_FINE_LOCATION"
-      ],
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_FINE_LOCATION"],
       "package": "com.anonymous.publictransportnetwork"
     },
     "web": {
