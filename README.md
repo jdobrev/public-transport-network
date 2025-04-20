@@ -15,14 +15,6 @@ A sample Expo project to visualize an overground public transport network.
 
 ## 📥 Download
 
-Grab the latest Android APK directly from our Releases page:
+Android APK
 
 👉 https://github.com/jdobrev/public-transport-network/releases
-
----
-
-Feel free to swap that badge for the “tags” endpoint instead:
-
-```md
-[![Tags](https://img.shields.io/github/v/tag/jdobrev/public-transport-network?label=latest%20tag)](https://github.com/jdobrev/public-transport-network/tags)
-```
