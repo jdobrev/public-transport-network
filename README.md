@@ -1,7 +1,5 @@
 # Public Transport Network
 
-[![Latest Release](https://img.shields.io/github/v/release/jdobrev/public-transport-network?label=latest%20release)](https://github.com/jdobrev/public-transport-network/releases)
-
 A sample Expo project to visualize an overground public transport network.
 
 **Features**
