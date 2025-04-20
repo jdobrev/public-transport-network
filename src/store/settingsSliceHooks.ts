@@ -1,7 +1,7 @@
 import { useColorScheme as useRNColorScheme } from "react-native";
 import { useAppDispatch, useAppSelector } from "./store";
 import { settingsSlice } from "./settingsSlice";
-import { Language } from "@/constants/Languages";
+import { Language } from "@/locales/translation-config";
 
 export const useColorScheme = () => {
   const colorScheme = useRNColorScheme();

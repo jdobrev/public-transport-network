@@ -1,4 +1,4 @@
-import { Language, LANGUAGES } from "@/constants/Languages";
+import { Language, LANGUAGES } from "@/locales/translation-config";
 import { createSlice } from "@reduxjs/toolkit";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
