@@ -1,5 +1,7 @@
 # Public Transport Network
 
+[![Latest Release](https://img.shields.io/github/v/release/jdobrev/public-transport-network?label=latest%20release)](https://github.com/jdobrev/public-transport-network/releases)
+
 A sample Expo project to visualize an overground public transport network.
 
 **Features**
@@ -13,4 +15,16 @@ A sample Expo project to visualize an overground public transport network.
 - Custom collapsible header
 - User location on all maps
 
-Download the Android release on the right.
+## 📥 Download
+
+Grab the latest Android APK directly from our Releases page:
+
+👉 https://github.com/jdobrev/public-transport-network/releases
+
+---
+
+Feel free to swap that badge for the “tags” endpoint instead:
+
+```md
+[![Tags](https://img.shields.io/github/v/tag/jdobrev/public-transport-network?label=latest%20tag)](https://github.com/jdobrev/public-transport-network/tags)
+```
