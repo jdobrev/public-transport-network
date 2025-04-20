@@ -16,7 +16,7 @@ import {
   useToggleTramShown,
   useToggleTrolleybusShown,
 } from "@/store/filterSliceHooks";
-import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
+import { HeaderHook } from "@/hooks/useCollapsibleHeader";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
 type SectionItem = { id: string; name: string };
@@ -83,7 +83,6 @@ const RenderSectionHeader = React.memo(
   }
 );
 
-type HeaderHook = ReturnType<typeof useCollapsibleHeader>;
 type OverviewSectionListProps = {
   scrollHandler: HeaderHook["scrollHandler"];
   PlaceholderHeader: HeaderHook["PlaceholderHeader"];

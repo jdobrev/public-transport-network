@@ -107,6 +107,8 @@ export function useCollapsibleHeader(headerHeight = DEFAULT_HEADER_HEIGHT) {
   };
 }
 
+export type HeaderHook = ReturnType<typeof useCollapsibleHeader>;
+
 const styles = StyleSheet.create({
   header: {
     position: "absolute",

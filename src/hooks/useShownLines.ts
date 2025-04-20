@@ -4,7 +4,8 @@ import { PublicTransportData } from "@/types";
 import { useMemo } from "react";
 
 export const useShownLines = () => {
-  const { data: transportData } = useGroupedTransportData();
+  const query = useGroupedTransportData();
+  const transportData = query.data;
 
   const hiddenLines = useAppSelector((state) => state.filter.hiddenLines);
   const shownTransports = useAppSelector(
@@ -14,7 +15,7 @@ export const useShownLines = () => {
   return useMemo(() => {
     const shownLines: PublicTransportData[] = [];
     if (!transportData) {
-      return [];
+      return { ...query, data: [] };
     }
     if (shownTransports.A) {
       const busLines = transportData.A.filter(
@@ -35,9 +36,10 @@ export const useShownLines = () => {
       shownLines.push(...tramLines);
     }
 
-    return shownLines;
+    return { ...query, data: shownLines };
   }, [
     hiddenLines,
+    query,
     shownTransports.A,
     shownTransports.TB,
     shownTransports.TM,

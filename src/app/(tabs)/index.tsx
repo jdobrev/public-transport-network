@@ -61,6 +61,9 @@ export default function OverviewScreen() {
         />
       ) : (
         <OverviewMapView
+          PlaceholderHeader={PlaceholderHeader}
+          scrollHandler={scrollHandler}
+          headerHeight={headerHeight}
           onPressFilter={onPressFilter}
           onPressLine={onPressLine}
         />
