@@ -9,7 +9,6 @@ export default function Checkbox({
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
 }) {
-  //TODO get colors from theme, also accept colors as props
   const tint = useThemeColor({}, "primary");
   return (
     <ExpoCheckbox

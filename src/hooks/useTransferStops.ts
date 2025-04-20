@@ -12,7 +12,7 @@ export interface TransferStop {
 }
 
 // Thanks ChatGPT :)
-//TODO test if this is correct
+// Read more about the formula: https://medium.com/@gega.abzianidze.1/haversine-formula-in-react-native-abda04843888
 function getDistanceMeters(
   lat1: number,
   lon1: number,
