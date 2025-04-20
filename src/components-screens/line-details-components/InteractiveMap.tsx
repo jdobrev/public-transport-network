@@ -1,9 +1,12 @@
 import { View } from "@/components/View";
 import useRoutesRegion from "@/hooks/useRoutesRegion";
 import { Route, Stop } from "@/types";
+import { getBearing } from "@/utils/get-bearing";
 import React, { useMemo } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
+const inactiveArrow = require("@assets/images/arrows/inactive.png");
+const activeArrow = require("@assets/images/arrows/arrow.png");
 
 const STROKE_WIDTH = 12;
 const STROKE_COLOR = "#007AFF";
@@ -52,9 +55,36 @@ export default React.memo(function InteractiveMap({
     { coords: [...inactiveCoords] },
   ]);
 
+  const activeBearings = useMemo(() => {
+    const map = new Map<string, number>();
+    const { stops, segments } = activeRoute;
+
+    stops.forEach((stop, i) => {
+      //stops are 1 more than there are segments
+      const isLastStop = i < segments.length;
+
+      const segIdx = isLastStop ? i : segments.length - 1; // fall back to last segment as otherwise undefined
+      const coords = segments[segIdx].coordinates;
+
+      let fromPt, toPt;
+      if (isLastStop) {
+        fromPt = coords[0];
+        toPt = coords[1];
+      } else {
+        fromPt = coords[coords.length - 2];
+        toPt = coords[coords.length - 1];
+      }
+
+      const bearing = getBearing(fromPt.lat, fromPt.lon, toPt.lat, toPt.lon);
+      map.set(stop.id, bearing);
+    });
+
+    return map;
+  }, [activeRoute]);
+
   return (
     <View style={styles.flex}>
-      <MapView //TODO add colored arrow icons instead for markers
+      <MapView
         provider={PROVIDER_GOOGLE}
         style={{ width, height }}
         region={
@@ -103,7 +133,11 @@ export default React.memo(function InteractiveMap({
               longitude: stop.location.lon,
             }}
             onPress={() => onPressStop(stop, true)}
-            pinColor={"blue"}
+            flat
+            rotation={activeBearings.get(stop.id) ?? 0}
+            anchor={{ x: 0.5, y: 0.5 }}
+            image={stop.id === selectedStopId ? activeArrow : inactiveArrow}
+            zIndex={1}
           />
         ))}
       </MapView>
