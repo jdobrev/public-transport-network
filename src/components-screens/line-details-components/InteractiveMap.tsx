@@ -6,7 +6,8 @@ import React, { useMemo } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 const inactiveArrow = require("@assets/images/arrows/inactive.png");
-const activeArrow = require("@assets/images/arrows/arrow.png");
+const selectedArrow = require("@assets/images/arrows/arrow.png");
+const inactiveRouteStop = require("@assets/images/arrows/inactiveRouteStop.png");
 
 const STROKE_WIDTH = 12;
 const STROKE_COLOR = "#007AFF";
@@ -96,6 +97,7 @@ export default React.memo(function InteractiveMap({
           }
         }
         showsUserLocation
+        showsBuildings={false}
       >
         <Polyline
           coordinates={inactiveCoords}
@@ -114,8 +116,10 @@ export default React.memo(function InteractiveMap({
             onPress={() => {
               onPressStop(stop, false);
             }}
-            titleVisibility="visible"
-            pinColor="orange"
+            flat
+            anchor={{ x: 0.5, y: 0.5 }}
+            image={inactiveRouteStop}
+            zIndex={1}
           />
         ))}
 
@@ -136,8 +140,8 @@ export default React.memo(function InteractiveMap({
             flat
             rotation={activeBearings.get(stop.id) ?? 0}
             anchor={{ x: 0.5, y: 0.5 }}
-            image={stop.id === selectedStopId ? activeArrow : inactiveArrow}
-            zIndex={1}
+            image={stop.id === selectedStopId ? selectedArrow : inactiveArrow}
+            zIndex={2}
           />
         ))}
       </MapView>

@@ -6,8 +6,8 @@ import { View } from "@/components/View";
 import { HeaderHook } from "@/hooks/useCollapsibleHeader";
 import useRoutesRegion from "@/hooks/useRoutesRegion";
 import { useShownLines } from "@/hooks/useShownLines";
-import { useThemeColor } from "@/hooks/useThemeColor";
-import React, { useCallback, useMemo } from "react";
+import { getTransportColor } from "@/hooks/useTransportLineColors";
+import React, { useMemo } from "react";
 import { RefreshControl, StyleSheet } from "react-native";
 import MapView, { Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import Animated from "react-native-reanimated";
@@ -21,7 +21,6 @@ type OverviewMapProps = {
 };
 
 //TODO add tappable labels to each line for easier selection
-//TODO add more colors for each transport type
 const OverviewMapView = React.memo(
   ({
     scrollHandler,
@@ -32,18 +31,8 @@ const OverviewMapView = React.memo(
   }: OverviewMapProps) => {
     const { data: linesOnMap, isFetching, refetch, isError } = useShownLines();
 
-    const busColor = useThemeColor({}, "busColor");
-    const trolleybusColor = useThemeColor({}, "trolleybusColor");
-    const tramColor = useThemeColor({}, "tramColor");
-
-    const getColor = useCallback(
-      (t: string) =>
-        t === "A" ? busColor : t === "TB" ? trolleybusColor : tramColor,
-      [busColor, tramColor, trolleybusColor]
-    );
-
     const routesToRender = useMemo(() => {
-      const renderOnlyOneRoute = true; //change this to false to render both routes
+      const renderOnlyOneRoute = false; //change this to false to render both routes
       return linesOnMap.flatMap((line) => {
         const routes = renderOnlyOneRoute ? [line.routes[0]] : line.routes;
         return routes.map((route) => {
@@ -68,17 +57,19 @@ const OverviewMapView = React.memo(
 
     const renderLines = useMemo(
       () =>
-        routesToRender.map((r) => (
+        routesToRender.map((r, index) => (
           <Polyline
             key={r.routeId}
             coordinates={r.coords}
-            strokeColor={getColor(r.transportType)}
-            strokeWidth={10}
+            strokeColor={getTransportColor(r.transportType, index)}
+            strokeWidth={6}
             tappable
             onPress={() => onPressLine(r.lineId)}
+            hitSlop={20}
+            zIndex={1}
           />
         )),
-      [getColor, onPressLine, routesToRender]
+      [onPressLine, routesToRender]
     );
 
     const scrollingEnabled = isFetching || isError;
@@ -108,6 +99,7 @@ const OverviewMapView = React.memo(
                 longitudeDelta: 0.1,
               }
             }
+            showsBuildings={false}
           >
             {renderLines}
           </MapView>
