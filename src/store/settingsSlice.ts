@@ -1,3 +1,4 @@
+import { Language, LANGUAGES } from "@/constants/Languages";
 import { createSlice } from "@reduxjs/toolkit";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
@@ -7,6 +8,7 @@ type SettingsStore = {
   fetchDelay: string;
   errorChance: string;
   transferRadius: string;
+  language: Language;
 };
 
 const initialState: SettingsStore = {
@@ -14,6 +16,7 @@ const initialState: SettingsStore = {
   fetchDelay: "250",
   errorChance: "0",
   transferRadius: "20",
+  language: LANGUAGES.EN,
 };
 
 export const settingsSlice = createSlice({
@@ -43,6 +46,9 @@ export const settingsSlice = createSlice({
       action: PayloadAction<SettingsStore["transferRadius"]>
     ) => {
       state.transferRadius = action.payload;
+    },
+    setLanguage: (state, action: PayloadAction<SettingsStore["language"]>) => {
+      state.language = action.payload;
     },
   },
 });

@@ -7,9 +7,11 @@ import { ICON_SYMBOLS, IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/store/settingsSliceHooks";
+import { useTypedTranslation } from "@/locales/useTypedTranslation";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { t } = useTypedTranslation();
 
   return (
     <Tabs
@@ -30,7 +32,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Overview",
+          title: t("tabs.overview"),
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name={ICON_SYMBOLS.HOME} color={color} />
           ),
@@ -39,7 +41,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="vehicles"
         options={{
-          title: "Vehicles",
+          title: t("tabs.vehicles"),
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name={ICON_SYMBOLS.TRAIN} color={color} />
           ),
@@ -48,7 +50,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
+          title: t("tabs.settings"),
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name={ICON_SYMBOLS.SETTINGS} color={color} />
           ),

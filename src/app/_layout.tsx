@@ -9,6 +9,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { ComponentProps, useEffect } from "react";
 import "react-native-reanimated";
+import "@/locales/translation-config";
 
 import { useColorScheme } from "@/store/settingsSliceHooks";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -18,6 +19,7 @@ import { Provider as ReduxStoreProvider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "@/store/store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { LanguageLoader } from "@/locales/LanguageLoader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,21 +67,23 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <ReduxStoreProvider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            <ThemeProvider>
-              <SafeAreaProvider>
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                  }}
-                >
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen name="+not-found" />
-                </Stack>
-              </SafeAreaProvider>
-            </ThemeProvider>
+            <LanguageLoader>
+              <ThemeProvider>
+                <SafeAreaProvider>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                    }}
+                  >
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen name="+not-found" />
+                  </Stack>
+                </SafeAreaProvider>
+              </ThemeProvider>
+            </LanguageLoader>
           </PersistGate>
         </ReduxStoreProvider>
       </QueryClientProvider>

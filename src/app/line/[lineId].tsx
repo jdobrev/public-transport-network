@@ -23,6 +23,7 @@ import StopDetails from "@/components-screens/line-details-components/StopDetail
 import { useThemeColor } from "@/hooks/useThemeColor";
 import InteractiveMap from "@/components-screens/line-details-components/InteractiveMap";
 import { Stop } from "@/types";
+import { useTypedTranslation } from "@/locales/useTypedTranslation";
 
 const RenderStop = React.memo(
   ({
@@ -49,6 +50,7 @@ const RenderStop = React.memo(
 );
 
 export default function LineDetails() {
+  const { t } = useTypedTranslation();
   const { lineId } = useLocalSearchParams<{ lineId: string }>();
   const { data, isError, isFetching, refetch } = useLineData(lineId);
 
@@ -137,18 +139,22 @@ export default function LineDetails() {
           <View style={styles.flex}>
             <BackButton />
           </View>
-          <View style={styles.title}>
-            <Text type="title" style={[{ textAlign: "center" }]}>
-              Line {lineId}
-            </Text>
-          </View>
+          <Text type="title">
+            {t("screens.lineDetails.line")} {lineId}
+          </Text>
           <View style={styles.flex} />
         </View>
         <ButtonSwitch<FilterViewTypeValue>
           selectedOptionId={viewType}
           options={[
-            { id: FILTER_VIEW_TYPE_VALUES.LIST, label: "List" },
-            { id: FILTER_VIEW_TYPE_VALUES.MAP, label: "Map" },
+            {
+              id: FILTER_VIEW_TYPE_VALUES.LIST,
+              label: t("screens.lineDetails.list"),
+            },
+            {
+              id: FILTER_VIEW_TYPE_VALUES.MAP,
+              label: t("screens.lineDetails.map"),
+            },
           ]}
           onValueChange={setViewType}
         />
@@ -215,9 +221,6 @@ export default function LineDetails() {
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
-  },
-  title: {
-    flex: 3,
   },
   separator: {
     height: 8,

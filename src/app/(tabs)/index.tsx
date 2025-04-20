@@ -17,6 +17,7 @@ import ButtonSwitch from "@/components/Button-switch";
 import useNavigateToLineDetails from "@/hooks/useNavigateToLineDetails";
 import OverviewMapView from "@/components-screens/index-components/OverviewMapView";
 import OverviewSectionList from "@/components-screens/index-components/OverviewSectionList";
+import { useTypedTranslation } from "@/locales/useTypedTranslation";
 
 export default function OverviewScreen() {
   useMapPermissions();
@@ -39,15 +40,23 @@ export default function OverviewScreen() {
     setViewType(FILTER_VIEW_TYPE_VALUES.LIST);
   }, [setViewType]);
 
+  const { t } = useTypedTranslation();
+
   return (
     <SafeAreaView>
       <Header>
-        <Text type="title">Overview</Text>
+        <Text type="title">{t("screens.overview.title")}</Text>
         <ButtonSwitch<FilterViewTypeValue>
           selectedOptionId={viewType}
           options={[
-            { id: FILTER_VIEW_TYPE_VALUES.LIST, label: "List" },
-            { id: FILTER_VIEW_TYPE_VALUES.MAP, label: "Map" },
+            {
+              id: FILTER_VIEW_TYPE_VALUES.LIST,
+              label: t("screens.overview.list"),
+            },
+            {
+              id: FILTER_VIEW_TYPE_VALUES.MAP,
+              label: t("screens.overview.map"),
+            },
           ]}
           onValueChange={setViewType}
         />

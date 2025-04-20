@@ -3,13 +3,16 @@ import { SafeAreaView } from "@/components/SafeAreaView";
 import { Text } from "@/components/Text";
 import { View } from "@/components/View";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
+import { useTypedTranslation } from "@/locales/useTypedTranslation";
 import {
   useColorScheme,
   useErrorChance,
   useFetchDelay,
+  useLanguage,
   useSetColorScheme,
   useSetErrorChance,
   useSetFetchDelay,
+  useSetLanguage,
   useSetTransferRadius,
   useTransferRadius,
 } from "@/store/settingsSliceHooks";
@@ -18,8 +21,13 @@ import { StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 
 export default function Settings() {
+  const { t } = useTypedTranslation();
+
   const colorScheme = useColorScheme();
   const setColorScheme = useSetColorScheme();
+
+  const language = useLanguage();
+  const setLanguage = useSetLanguage();
 
   const fetchDelay = useFetchDelay();
   const setFetchDelay = useSetFetchDelay();
@@ -35,15 +43,15 @@ export default function Settings() {
   const settings = useMemo(
     () => [
       {
-        name: "Theme",
+        name: t("screens.settings.theme"),
         options: [
           {
             id: "light",
-            label: "Light",
+            label: t("screens.settings.light"),
           },
           {
             id: "dark",
-            label: "Dark",
+            label: t("screens.settings.dark"),
           },
         ],
         selectedOptionId: colorScheme,
@@ -52,7 +60,24 @@ export default function Settings() {
         },
       },
       {
-        name: "Fetch delay (ms)",
+        name: t("screens.settings.language"),
+        options: [
+          {
+            id: "en",
+            label: t("screens.settings.en"),
+          },
+          {
+            id: "bg",
+            label: t("screens.settings.bg"),
+          },
+        ],
+        selectedOptionId: language,
+        onValueChange: (newVal: string) => {
+          setLanguage(newVal === "en" ? "en" : "bg");
+        },
+      },
+      {
+        name: t("screens.settings.fetchDelay"),
         options: [
           {
             id: "250",
@@ -73,7 +98,7 @@ export default function Settings() {
         },
       },
       {
-        name: "Fetch error chance",
+        name: t("screens.settings.fetchErrorChance"),
         options: [
           {
             id: "0",
@@ -94,7 +119,7 @@ export default function Settings() {
         },
       },
       {
-        name: "Transfer radius (m)",
+        name: t("screens.settings.transferRadius"),
         options: [
           {
             id: "20",
@@ -119,10 +144,13 @@ export default function Settings() {
       colorScheme,
       errorChance,
       fetchDelay,
+      language,
       setColorScheme,
       setErrorChance,
       setFetchDelay,
+      setLanguage,
       setTransferRadius,
+      t,
       transferRadius,
     ]
   );
@@ -130,12 +158,20 @@ export default function Settings() {
   return (
     <SafeAreaView>
       <Header>
-        <Text type="title">Settings</Text>
+        <Text type="title">{t("screens.settings.title")}</Text>
       </Header>
       <Animated.ScrollView onScroll={scrollHandler}>
         <PlaceholderHeader />
         {settings.map((setting) => (
-          <View key={setting.name} style={styles.settingsRow}>
+          <View
+            key={setting.name}
+            style={{
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 20,
+            }}
+          >
             <Text>{setting.name}</Text>
             <ButtonSwitch
               selectedOptionId={setting.selectedOptionId}
@@ -153,6 +189,9 @@ export default function Settings() {
 }
 
 const styles = StyleSheet.create({
+  settingTitle: {
+    marginBottom: 10,
+  },
   settingsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -160,6 +199,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   buttonsContainer: {
-    maxWidth: 250,
+    flex: 1,
   },
 });

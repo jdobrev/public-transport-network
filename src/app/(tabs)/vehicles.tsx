@@ -19,6 +19,7 @@ import MapView, { Marker } from "react-native-maps";
 import Button from "@/components/Button";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useTypedTranslation } from "@/locales/useTypedTranslation";
 
 const VEHICLE_ITEM_HEIGHT = 100;
 type VehicleListItem = Parameters<ListRenderItem<Vehicle>>[0];
@@ -47,6 +48,8 @@ const VehicleItem = React.memo(
 );
 
 export default function VehiclesScreen() {
+  const { t } = useTypedTranslation();
+
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
   const {
@@ -112,7 +115,7 @@ export default function VehiclesScreen() {
     <SafeAreaView>
       <Header>
         <View>
-          <Text type="title">Vehicles</Text>
+          <Text type="title">{t("screens.vehicles.title")}</Text>
         </View>
       </Header>
       <Animated.FlatList

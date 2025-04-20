@@ -7,6 +7,7 @@ import { HeaderHook } from "@/hooks/useCollapsibleHeader";
 import useRoutesRegion from "@/hooks/useRoutesRegion";
 import { useShownLines } from "@/hooks/useShownLines";
 import { getTransportColor } from "@/hooks/useTransportLineColors";
+import { useTypedTranslation } from "@/locales/useTypedTranslation";
 import React, { useMemo } from "react";
 import { RefreshControl, StyleSheet } from "react-native";
 import MapView, { Polyline, PROVIDER_GOOGLE } from "react-native-maps";
@@ -29,6 +30,7 @@ const OverviewMapView = React.memo(
     onPressFilter,
     onPressLine,
   }: OverviewMapProps) => {
+    const { t } = useTypedTranslation();
     const { data: linesOnMap, isFetching, refetch, isError } = useShownLines();
 
     const routesToRender = useMemo(() => {
@@ -80,7 +82,7 @@ const OverviewMapView = React.memo(
       if (routesToRender.length === 0) {
         return (
           <View style={styles.center}>
-            <Text>No lines selected</Text>
+            <Text>{t("screens.overview.noLinesSelected")}</Text>
           </View>
         );
       }
@@ -116,6 +118,7 @@ const OverviewMapView = React.memo(
       renderLines,
       routesToRender.length,
       scrollingEnabled,
+      t,
     ]);
 
     return (

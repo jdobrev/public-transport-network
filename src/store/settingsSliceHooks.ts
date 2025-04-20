@@ -1,6 +1,7 @@
 import { useColorScheme as useRNColorScheme } from "react-native";
 import { useAppDispatch, useAppSelector } from "./store";
 import { settingsSlice } from "./settingsSlice";
+import { Language } from "@/constants/Languages";
 
 export const useColorScheme = () => {
   const colorScheme = useRNColorScheme();
@@ -47,4 +48,14 @@ export const useSetTransferRadius = () => {
     dispatch(settingsSlice.actions.setTransferRadius(transferRadius));
   };
   return setTransferRadius;
+};
+
+export const useLanguage = () =>
+  useAppSelector((state) => state.settings.language);
+export const useSetLanguage = () => {
+  const dispatch = useAppDispatch();
+  const setLanguage = (language: Language) => {
+    dispatch(settingsSlice.actions.setLanguage(language));
+  };
+  return setLanguage;
 };

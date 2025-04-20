@@ -18,6 +18,7 @@ import {
 } from "@/store/filterSliceHooks";
 import { HeaderHook } from "@/hooks/useCollapsibleHeader";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useTypedTranslation } from "@/locales/useTypedTranslation";
 
 type SectionItem = { id: string; name: string };
 type Section = {
@@ -96,6 +97,8 @@ export default React.memo(function OverviewSectionList({
   scrollHandler,
   onPressLine,
 }: OverviewSectionListProps) {
+  const { t } = useTypedTranslation();
+
   const isBusShown = useIsBusShown();
   const isTrolleybusShown = useIsTrolleybusShown();
   const isTramShown = useIsTramShown();
@@ -143,21 +146,21 @@ export default React.memo(function OverviewSectionList({
   const sections: Section[] = useMemo(() => {
     return [
       {
-        title: "Bus",
+        title: t("screens.overview.bus"),
         data: isBusShown ? busData : [],
         filterValue: isBusShown,
         toggle: toggleBusShown,
         color: busColor,
       },
       {
-        title: "Trolleybus",
+        title: t("screens.overview.trolleybus"),
         data: isTrolleybusShown ? trolleybusData : [],
         filterValue: isTrolleybusShown,
         toggle: toggleTrolleybusShown,
         color: trolleybusColor,
       },
       {
-        title: "Tram",
+        title: t("screens.overview.tram"),
         data: isTramShown ? tramData : [],
         filterValue: isTramShown,
         toggle: toggleTramShown,
@@ -165,18 +168,19 @@ export default React.memo(function OverviewSectionList({
       },
     ];
   }, [
+    t,
     isBusShown,
-    busData,
-    toggleBusShown,
-    busColor,
     isTrolleybusShown,
-    trolleybusData,
-    toggleTrolleybusShown,
-    trolleybusColor,
     isTramShown,
+    busData,
+    trolleybusData,
     tramData,
-    toggleTramShown,
+    busColor,
+    trolleybusColor,
     tramColor,
+    toggleBusShown,
+    toggleTrolleybusShown,
+    toggleTramShown,
   ]);
 
   const renderItem = useCallback(

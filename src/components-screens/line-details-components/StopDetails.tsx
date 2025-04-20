@@ -6,8 +6,11 @@ import React from "react";
 import { useTransferStops } from "@/hooks/useTransferStops";
 import { useTransportData } from "@/server/queries";
 import { useTransferRadius } from "@/store/settingsSliceHooks";
+import { useTypedTranslation } from "@/locales/useTypedTranslation";
 
 const TransferStops = (props: Parameters<typeof useTransferStops>[0]) => {
+  const { t } = useTypedTranslation();
+
   let transferRadius = 20;
   const transferRadiusFromStore = useTransferRadius();
   if (!!transferRadiusFromStore) {
@@ -24,21 +27,28 @@ const TransferStops = (props: Parameters<typeof useTransferStops>[0]) => {
   return (
     <View style={styles.transferStopsContainer}>
       <Text type="subtitle" style={styles.textCenter}>
-        Transfer stops (within {transferRadius}m)
+        {t("screens.lineDetails.stopDetails.transferStops", {
+          distance: transferRadius,
+        })}
       </Text>
       {transfers.length ? (
-        transfers.map((t) => (
+        transfers.map((transfer) => (
           <Text
-            key={`${t.line}-${t.routeId}-${t.stop.id}`}
+            key={`${transfer.line}-${transfer.routeId}-${transfer.stop.id}`}
             style={styles.transferStopsRow}
           >
-            {t.sameLine ? "(same line)" : "(other line)"} {t.line} –{" "}
-            {t.stop.name}
-            {` (${Math.round(t.distance)} m)`}
+            {"("}
+            {transfer.sameLine
+              ? t("screens.lineDetails.stopDetails.sameLine")
+              : t("screens.lineDetails.stopDetails.otherLine")}
+            {")"} {transfer.line} – {transfer.stop.name}
+            {` (${Math.round(transfer.distance)} m)`}
           </Text>
         ))
       ) : (
-        <Text style={styles.textCenter}>No transfers found</Text>
+        <Text style={styles.textCenter}>
+          {t("screens.lineDetails.stopDetails.noTransferStops")}
+        </Text>
       )}
     </View>
   );
@@ -54,12 +64,15 @@ export default React.memo(function StopDetails({
   routeId: number;
 }) {
   const { data } = useTransportData(); //Thid would maybe be a different call to get more targeted data
+  const { t } = useTypedTranslation();
 
   return (
     <View style={styles.container}>
       <Text type="title">{stop.name}</Text>
       <View style={styles.detailsRow}>
-        <Text type="defaultSemiBold">Average people: </Text>
+        <Text type="defaultSemiBold">
+          {t("screens.lineDetails.stopDetails.averagePeople")}:{" "}
+        </Text>
         <Text type="defaultSemiBold">{stop.averagePeople}</Text>
       </View>
       {data && (
