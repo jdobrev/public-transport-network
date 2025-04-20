@@ -9,10 +9,8 @@ import { Text } from "@/components/Text";
 import { View } from "@/components/View";
 import { useVehicles } from "@/server/queries";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import React from "react";
 import { Vehicle } from "@/types";
-import ActivityIndicator from "@/components/ActivityIndicator";
 import { SafeAreaView } from "@/components/SafeAreaView";
 import Animated from "react-native-reanimated";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
@@ -34,12 +32,14 @@ const VehicleItem = React.memo(
     onPress: (item: Vehicle) => void;
   }) => {
     return (
-      <Button onPress={() => onPress(item)}>
-        <View style={styles.vehicleContainer}>
-          <Text>{index + 1}</Text>
-          <View style={styles.vehicle}>
-            <Text>{item.vehID}</Text>
-          </View>
+      <Button
+        onPress={() => onPress(item)}
+        style={styles.vehicleContainer}
+        type="ghost"
+      >
+        <Text>{index + 1}</Text>
+        <View style={styles.vehicle}>
+          <Text>{item.vehID}</Text>
         </View>
       </Button>
     );
@@ -47,7 +47,6 @@ const VehicleItem = React.memo(
 );
 
 export default function VehiclesScreen() {
-  const [listHeight, setListHeight] = useState(0);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
   const {
@@ -59,28 +58,36 @@ export default function VehiclesScreen() {
     fetchNextPage,
     isFetchingNextPage,
   } = useVehicles();
-
-  const { Header, scrollHandler, PlaceholderHeader, headerHeight } =
-    useCollapsibleHeader();
-
   const vehicles = useMemo(
     () => vehiclesData?.pages.flatMap((page) => page.data) ?? [],
     [vehiclesData]
   );
+
+  const [listHeight, setListHeight] = useState(0);
+  const { Header, scrollHandler, PlaceholderHeader, headerHeight } =
+    useCollapsibleHeader();
 
   const onListLayout = useCallback((e: LayoutChangeEvent) => {
     const { height } = e.nativeEvent.layout;
     setListHeight(height);
   }, []);
 
-  const dynamicThreshold =
-    listHeight > 0 ? (5 * VEHICLE_ITEM_HEIGHT) / listHeight : 0.5; // refetch 5 items before the end of the list
-
-  const tabBarHeight = useBottomTabBarHeight();
+  const PREFETCH_ITEMS = 5;
+  const rawThreshold =
+    listHeight > 0 ? (PREFETCH_ITEMS * VEHICLE_ITEM_HEIGHT) / listHeight : 1;
+  // clamp to [0,1]
+  const dynamicThreshold = Math.min(1, Math.max(0, rawThreshold));
 
   const sheetRef = useRef<BottomSheet>(null);
   const handleBackground = useThemeColor({}, "bottomSheetHandleBackground");
   const background = useThemeColor({}, "background");
+
+  // during normal fetching show indicator on top, during pagination show it on bottom
+  const bottomLoaderOffset = useMemo(() => listHeight - 100, [listHeight]);
+  const progressViewOffset = useMemo(
+    () => (isFetchingNextPage ? bottomLoaderOffset : headerHeight),
+    [bottomLoaderOffset, headerHeight, isFetchingNextPage]
+  );
 
   const mapRef = useRef<MapView>(null);
 
@@ -114,9 +121,9 @@ export default function VehiclesScreen() {
         keyExtractor={(item) => item.vehID}
         refreshControl={
           <RefreshControl
-            refreshing={isFetching && !isFetchingNextPage}
+            refreshing={isFetching}
             onRefresh={refetch}
-            progressViewOffset={headerHeight}
+            progressViewOffset={progressViewOffset}
           />
         }
         onEndReached={() => {
@@ -126,11 +133,6 @@ export default function VehiclesScreen() {
         }}
         onEndReachedThreshold={dynamicThreshold}
         ListHeaderComponent={<PlaceholderHeader />}
-        ListFooterComponent={
-          <View style={{ paddingBottom: tabBarHeight }}>
-            {isFetchingNextPage ? <ActivityIndicator /> : null}
-          </View>
-        }
         initialNumToRender={10}
         maxToRenderPerBatch={20}
         windowSize={5}
@@ -194,10 +196,12 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 10,
     alignItems: "center",
+    margin: 0,
   },
   vehicle: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "transparent",
   },
 });

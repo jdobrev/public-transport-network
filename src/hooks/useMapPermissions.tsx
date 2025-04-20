@@ -5,6 +5,7 @@ import { View } from "@/components/View";
 import ActivityIndicator from "@/components/ActivityIndicator";
 import { StyleSheet } from "react-native";
 
+//TODO update hook to not return jsx itself. Handle denied permissions in the component that uses this hook
 export default function useMapPermissions() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   useEffect(() => {

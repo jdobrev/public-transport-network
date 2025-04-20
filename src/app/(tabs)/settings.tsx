@@ -63,8 +63,8 @@ export default function Settings() {
             label: "750",
           },
           {
-            id: "2000",
-            label: "2000",
+            id: "5000",
+            label: "5000",
           },
         ],
         selectedOptionId: fetchDelay,
