@@ -13,8 +13,6 @@ A sample Expo project to visualize an overground public transport network.
 - Custom collapsible header
 - User location on all maps
 
-## 📥 Download
-
-Android APK
+## Download
 
 👉 https://github.com/jdobrev/public-transport-network/releases
