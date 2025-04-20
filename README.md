@@ -1,7 +1,6 @@
 # Public Transport Network
 
-A sample Expo demo project to visualize an overground public transport network.
-Currently with mocked API.
+Demo project to visualize an overground public transport network. Currently with mocked API.
 
 ## Download
 
