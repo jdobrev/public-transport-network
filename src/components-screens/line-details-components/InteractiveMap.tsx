@@ -98,6 +98,7 @@ export default React.memo(function InteractiveMap({
         }
         showsUserLocation
         showsBuildings={false}
+        moveOnMarkerPress={false}
       >
         <Polyline
           coordinates={inactiveCoords}
